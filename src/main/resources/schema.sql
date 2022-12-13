@@ -13,7 +13,6 @@ create table if not exists agency_mode (
     id bigint NOT NULL PRIMARY KEY auto_increment,
 	ntd_id bigint NOT NULL,
     FOREIGN KEY (ntd_id) REFERENCES agency(ntd_id),
-    agency_name VARCHAR(255),
     mode VARCHAR(255),
     type_of_service VARCHAR(255),
     report_year bigint,
@@ -24,9 +23,8 @@ create table if not exists agency_mode (
     operating_expenses bigint
 );
 
-
 ALTER TABLE agency_mode
-ADD CONSTRAINT agency_mode_key UNIQUE (agency_name, type_of_service, report_year);
+ADD CONSTRAINT agency_mode_key UNIQUE (ntd_id, mode, type_of_service);
 
 CREATE table if not exists transit_mode (
 	id bigint NOT NULL PRIMARY KEY auto_increment,
@@ -47,6 +45,5 @@ CREATE table if not exists ridership_data (
     type VARCHAR(255) NOT NULL,
     year bigint NOT NULL,
     month bigint NOT NULL
-)
-
+);
 

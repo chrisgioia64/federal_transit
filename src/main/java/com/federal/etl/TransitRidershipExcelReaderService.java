@@ -102,7 +102,6 @@ public class TransitRidershipExcelReaderService {
 
                 AgencyMode agencyMode = new AgencyMode();
                 agencyMode.setNtdId(ntdId);
-                agencyMode.setAgencyName(agencyName);
                 agencyMode.setMode(mode);
                 agencyMode.setTypeOfService(tos);
                 agencyMode.setReportYear(mostRecentYear);
@@ -122,16 +121,24 @@ public class TransitRidershipExcelReaderService {
     public List<String> loadData() {
         String filename = ADJUST_DATABASE_DOC;
         XSSFWorkbook workbook = null;
-        XSSFSheet userSheet = workbook.getSheetAt(1);
-        List<String> result = loadMasterData(userSheet);
-        return result;
+        try {
+            workbook = new XSSFWorkbook(new File(filename));
+            XSSFSheet userSheet = workbook.getSheetAt(1);
+            List<String> result = loadMasterData(userSheet);
+            return result;
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InvalidFormatException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public Integer getInteger(XSSFCell cell) {
-        String number = "";
+        Double number = 0.0;
         try {
-            number = cell.getStringCellValue();
-            return Integer.parseInt(number);
+            number = cell.getNumericCellValue();
+            return number.intValue();
         } catch (NumberFormatException ex) {
             log.warn("Could not translate the " + number + " into a number");
             return 0;

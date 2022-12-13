@@ -2,6 +2,7 @@ package com.federal.dao;
 
 import com.federal.model.Agency;
 import com.federal.model.AgencyMode;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
@@ -13,9 +14,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Log4j2
 public class AgencyModeDaoImpl implements AgencyModeDao {
 
-    public static final String TABLE_NAME = "Agency";
+    public static final String TABLE_NAME = "Agency_Mode";
 
     private static final String ID = "id";
     private static final String NTD_ID = "ntd_id";
@@ -47,7 +49,6 @@ public class AgencyModeDaoImpl implements AgencyModeDao {
             AgencyMode agency = new AgencyMode();
             int id = rs.getInt(ID);
             agency.setId(id);
-            agency.setAgencyName(rs.getString(AGENCY_NAME));
             agency.setNtdId(rs.getInt(NTD_ID));
             agency.setMode(rs.getString(MODE));
             agency.setTypeOfService(rs.getString(TYPE_OF_SERVICE));
@@ -63,9 +64,9 @@ public class AgencyModeDaoImpl implements AgencyModeDao {
 
     @Override
     public int addAgencyMode(AgencyMode agencyMode) {
+        log.info("Agency Mode: " + agencyMode.toString());
         Map<String, Object> params = new HashMap<>();
         params.put(NTD_ID, agencyMode.getNtdId());
-        params.put(AGENCY_NAME, agencyMode.getAgencyName());
         params.put(MODE, agencyMode.getMode());
         params.put(TYPE_OF_SERVICE, agencyMode.getTypeOfService());
         params.put(REPORT_YEAR, agencyMode.getReportYear());

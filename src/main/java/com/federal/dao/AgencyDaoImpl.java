@@ -60,6 +60,7 @@ public class AgencyDaoImpl implements AgencyDao {
     @Override
     public int addAgency(Agency agency) {
         Map<String, Object> params = new HashMap<>();
+        log.info("Agency: " + agency.toString());
         params.put(NTD_ID, agency.getNtdId());
         params.put(AGENCY_NAME, agency.getAgencyName());
         params.put(CITY, agency.getCity());
