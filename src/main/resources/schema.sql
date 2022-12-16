@@ -44,6 +44,7 @@ CREATE table if not exists ridership_data (
     FOREIGN KEY (agency_mode_id) REFERENCES agency_mode(id),
     type VARCHAR(255) NOT NULL,
     year bigint NOT NULL,
-    month bigint NOT NULL
+    month bigint NOT NULL,
+    data bigint NOT NULL
 );
 

@@ -13,4 +13,8 @@ public interface AgencyModeDao {
 
     public List<AgencyMode> getAgencyModesByNtdId(int ntd_id);
 
+    public Integer getId(int ntdId, String mode, String typeOfService);
+
+    public AgencyMode getAgencyMode(int id, String mode, String typeOfService);
+
 }

@@ -93,4 +93,22 @@ public class AgencyModeDaoImpl implements AgencyModeDao {
                 TABLE_NAME, NTD_ID);
         return template.query(sql, new AgencyModeDaoImpl.AgencyModeRowMapper(), ntd_id);
     }
+
+    @Override
+    public Integer getId(int ntdId, String mode, String typeOfService) {
+        AgencyMode obj = getAgencyMode(ntdId, mode, typeOfService);
+        return obj.getId();
+    }
+
+    @Override
+    public AgencyMode getAgencyMode(int ntdId, String mode, String typeOfService) {
+        String sql = String.format(
+                "SELECT * FROM %s WHERE %s = ? AND %s = ? AND %s = ?;",
+                TABLE_NAME, NTD_ID, MODE, TYPE_OF_SERVICE);
+        AgencyMode obj = template.queryForObject(sql,
+                new AgencyModeDaoImpl.AgencyModeRowMapper(),
+                ntdId, mode, typeOfService);
+        return obj;
+    }
+
 }

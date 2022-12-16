@@ -4,10 +4,12 @@ import com.federal.etl.DatabaseSchemaService;
 import com.federal.etl.TransitRidershipExcelReaderService;
 import lombok.extern.java.Log;
 import lombok.extern.log4j.Log4j2;
+import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import java.io.FileNotFoundException;
@@ -28,10 +30,34 @@ public class DatabaseLoaderController {
         this.databaseSchemaService = databaseSchemaService;
     }
 
-    @PostMapping("/database/load")
-    public ResponseEntity loadDatabase() {
-        service.loadData();
+    @PostMapping("/database/load_master/{id}")
+    public ResponseEntity loadMasterDatabase(@PathVariable int id) {
+        service.loadMasterData(id);
         return ResponseEntity.ok("Data loaded successfully");
+    }
+
+    @PostMapping("/database/load_upt/{id}")
+    public ResponseEntity loadUpt(@PathVariable int id) {
+        service.loadUptData(id);
+        return ResponseEntity.ok("Data loaded successfully into upt");
+    }
+
+    @PostMapping("/database/load_vrm/{id}")
+    public ResponseEntity loadVrm(@PathVariable int id) {
+        service.loadVrmData(id);
+        return ResponseEntity.ok("Data loaded successfully into vrm");
+    }
+
+    @PostMapping("/database/load_vrh/{id}")
+    public ResponseEntity loadVrh(@PathVariable int id) {
+        service.loadVrhData(id);
+        return ResponseEntity.ok("Data loaded successfully into vrh");
+    }
+
+    @PostMapping("/database/load_voms/{id}")
+    public ResponseEntity loadDatabase(@PathVariable int id) {
+        service.loadVomsData(id);
+        return ResponseEntity.ok("Data loaded successfuly into voms");
     }
 
     @GetMapping("/database/num_agencies")

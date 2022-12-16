@@ -29,7 +29,5 @@ public class FederalTransitCommandLineRunner
 
     @Override
     public void run(String... args) {
-        List<String> agencies = service.loadData();
-        LOG.info("Agencies: " + agencies);
     }
 }
