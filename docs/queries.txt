@@ -1,0 +1,44 @@
+# Rank states by the total passenger miles
+SELECT SUM(agency_mode.passenger_miles), COUNT(agency_mode.passenger_miles), agency.state
+FROM agency INNER JOIN agency_mode
+ WHERE agency_mode.ntd_id = agency.ntd_id
+ GROUP BY agency.state ORDER BY SUM(agency_mode.passenger_miles) DESC;
+
+# Rank states by unlinked passenger trips
+SELECT SUM(agency_mode.upt), agency.state
+FROM agency INNER JOIN agency_mode
+ WHERE agency_mode.ntd_id = agency.ntd_id
+ GROUP BY agency.state ORDER BY SUM(agency_mode.upt) DESC;
+
+# Rank agencies by Light Rail unlinked passenger trips
+SELECT SUM(agency_mode.upt), agency.agency_name, agency.city, agency.state
+FROM agency INNER JOIN agency_mode
+ WHERE agency_mode.ntd_id = agency.ntd_id AND agency_mode.mode = 'LR'
+ GROUP BY agency.agency_name ORDER BY SUM(agency_mode.upt) DESC;
+
+# Rank agencies by Bus (MetroBus and Commuter Bus) unlinked passenger trips
+SELECT SUM(agency_mode.upt), agency.agency_name, agency.city, agency.state
+FROM agency INNER JOIN agency_mode
+ WHERE agency_mode.ntd_id = agency.ntd_id AND (agency_mode.mode = 'MB' OR agency_mode.mode = 'CB')
+ GROUP BY agency.agency_name ORDER BY SUM(agency_mode.upt) DESC;
+
+# Rank average trip by agency
+SELECT agency_mode.passenger_miles / agency_mode.upt, agency.agency_name, agency.city, agency.state,
+ agency_mode.mode
+FROM agency INNER JOIN agency_mode
+ WHERE agency_mode.ntd_id = agency.ntd_id
+ ORDER BY  agency_mode.passenger_miles / agency_mode.upt DESC;
+
+# Rank operating expenses by agency
+SELECT SUM(agency_mode.operating_expenses), agency.agency_name, agency.city, agency.state,
+ agency_mode.mode
+FROM agency INNER JOIN agency_mode
+ WHERE agency_mode.ntd_id = agency.ntd_id AND agency_mode.ntd_id=20008
+ GROUP BY agency_mode.ntd_id;
+
+Aggregation Hierarchy
+- State
+- Metropolitan Area (e.g. Seattle, WA)
+- Agency
+
+- UPT / Service Population
