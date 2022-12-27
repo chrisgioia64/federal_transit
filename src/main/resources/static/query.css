@@ -1,0 +1,25 @@
+table#query_table {
+    border: 1px solid black;
+}
+
+table#result_table {
+    margin-top: 10px;
+    border: 1px solid black;
+}
+
+#result_table .col_rank {
+    width: 20px;
+}
+
+#result_table .col_entity {
+    width: 300px;
+}
+
+#result_table .col_statistic {
+    width: 140px;
+}
+
+#result_table .row_header {
+    font-weight: bold;
+    background-color: rgb(220, 230, 255);
+}

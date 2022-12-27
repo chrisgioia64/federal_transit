@@ -1,0 +1,50 @@
+<html>
+<head>
+    <title>Federal Transit</title>
+
+    <script src="query.js"></script>
+    <link rel="stylesheet" href="query.css">
+
+</head>
+
+<body>
+<h1>Federal Transit</h1>
+<table id="query_table">
+    <tr>
+        <td class="col_1">Aggregate Statistic</td>
+        <td class="col_2">
+            <select id="aggregate_statistic" name="aggregate_statistic">
+                <option value="UPT">UPT</option>
+                <option value="PASSENGER_MILES">Passenger Miles</option>
+                <option value="OPERATING_EXPENSES">Operating Expenses</option>
+                <option value="FARE">Fares</option>
+            </select>
+        </td>
+    </tr>
+
+    <tr>
+        <td class="col_1">Entity Type</td>
+        <td class="col_2">
+            <select id="entity_type" name="entity_type">
+                <option value="AGENCY">Agency Name</option>
+                <option value="CITY">City</option>
+                <option value="STATE">State</option>
+                <option value="AGENCY_MODE">Agency Mode</option>
+            </select>
+        </td>
+    </tr>
+    <tr>
+        <td class="col_1">
+
+        </td>
+        <td class="col_2">
+            <input id="search_button" type="button" value="Search">
+        </td>
+    </tr>
+</table>
+
+<table id="result_table">
+
+</table>
+</body>
+</html>

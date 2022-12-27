@@ -11,4 +11,10 @@ public class HtmlController {
         return "home.html";
     }
 
+    @GetMapping("/query")
+    public String getQueryPage() {
+        return "query.html";
+    }
+
+
 }

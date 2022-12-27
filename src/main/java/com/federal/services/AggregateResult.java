@@ -9,7 +9,7 @@ import lombok.ToString;
 @ToString
 public class AggregateResult {
 
-    private int aggregateStatistic;
+    private long aggregateStatistic;
     private String entityName;
 
 }

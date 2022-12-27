@@ -43,7 +43,7 @@ public class AggregateStatisticDaoImpl implements AggregateStatisticDao {
         @Override
         public AggregateResult mapRow(ResultSet rs, int rowNum) throws SQLException {
             AggregateResult result = new AggregateResult();
-            result.setAggregateStatistic(rs.getInt(1));
+            result.setAggregateStatistic(rs.getLong(1));
             result.setEntityName(rs.getString(2));
             return result;
         }
