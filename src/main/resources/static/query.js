@@ -5,7 +5,34 @@ window.onload = function() {
     const searchButton = document.querySelector('#search_button');
     searchButton.addEventListener('click', () => {
        updateResultsTable();
+        printResults();
     });
+
+    const nextButton = document.querySelector("#next_button");
+    nextButton.addEventListener('click', () => {
+        let pageNumber = CURRENT_PAGE + 1;
+        CURRENT_PAGE++;
+        setPage(pageNumber);
+        loadResults(pageNumber);
+    });
+
+    const prevButton = document.querySelector("#prev_button");
+    prevButton.addEventListener('click', () => {
+        let pageNumber = CURRENT_PAGE - 1;
+        CURRENT_PAGE--;
+        setPage(pageNumber);
+        loadResults(pageNumber);
+    });
+
+}
+
+var resultsGlobal = [];
+var CURRENT_PAGE = 0;
+var PAGINATION_LIMIT = 10;
+var PAGE_COUNT = 0;
+
+function printResults() {
+    console.log("resultsGlobal: " + resultsGlobal.length);
 }
 
 async function updateResultsTable() {
@@ -17,19 +44,55 @@ async function updateResultsTable() {
     let entityValue = entityType.options[entityType.selectedIndex].text;
     let aggregateValue = statisticElement.options[statisticElement.selectedIndex].text;
     let innerHTML = getResultsTableHeaderRow(entityValue, aggregateValue);
-    console.log(innerHTML);
+    let tableHeader = document.querySelector("#result_table thead");
+    tableHeader.innerHTML = innerHTML;
 
+    innerHTML = "";
     let json = await loadAggregateStatistics(statisticElement.value, entityType.value, "LR");
+    resultsGlobal = json;
+    PAGE_COUNT = Math.ceil(resultsGlobal.length / PAGINATION_LIMIT);
+    console.log("pages: " + PAGE_COUNT);
     let endIndex = Math.min(10, json.length);
     for (var i = 0; i < endIndex; i++) {
         htmlRow = getHtmlRow(json[i], i);
         innerHTML += htmlRow;
-        console.log("row: " + htmlRow);
     }
 
-    let table = document.querySelector("#result_table");
+    let table = document.querySelector("#result_table tbody");
     table.innerHTML = innerHTML;
+    setPage(CURRENT_PAGE);
+}
 
+function loadResults(pageNumber) {
+    let startIndex = pageNumber * PAGINATION_LIMIT;
+    let endIndex = Math.min(startIndex + PAGINATION_LIMIT, resultsGlobal.length);
+    let innerHTML = "";
+    for (var i = startIndex; i < endIndex; i++) {
+        htmlRow = getHtmlRow(resultsGlobal[i], i);
+        innerHTML += htmlRow;
+    }
+
+    let table = document.querySelector("#result_table tbody");
+    table.innerHTML = innerHTML;
+}
+
+function setPage(pageNumber) {
+    let prevButton = document.querySelector("#prev_button");
+    let nextButton = document.querySelector("#next_button");
+    if (pageNumber == 0) {
+        prevButton.disabled = true;
+        prevButton.classList.add("disabled");
+    } else {
+        prevButton.disabled = false;
+        prevButton.classList.remove("disabled");
+    }
+    if (pageNumber == PAGE_COUNT - 1) {
+        nextButton.disabled = true;
+        nextButton.classList.add("disabled");
+    } else {
+        nextButton.disabled = false;
+        nextButton.classList.remove("disabled");
+    }
 }
 
 function getResultsTableHeaderRow(entityValue, aggregateValue) {

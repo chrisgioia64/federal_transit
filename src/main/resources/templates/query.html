@@ -9,12 +9,13 @@
 
 <body>
 <h1>Federal Transit</h1>
+<div id="query_panel">
 <table id="query_table">
     <tr>
         <td class="col_1">Aggregate Statistic</td>
         <td class="col_2">
             <select id="aggregate_statistic" name="aggregate_statistic">
-                <option value="UPT">UPT</option>
+                <option value="UPT">Unlinked Passenger Trips</option>
                 <option value="PASSENGER_MILES">Passenger Miles</option>
                 <option value="OPERATING_EXPENSES">Operating Expenses</option>
                 <option value="FARE">Fares</option>
@@ -42,9 +43,22 @@
         </td>
     </tr>
 </table>
+</div>    
 
-<table id="result_table">
+<div id="results_panel">
+    <table id="result_table">
+        <thead>
 
-</table>
+        </thead>
+        <tbody>
+
+        </tbody>
+    </table>
+    <div id="pagination_subpanel">
+        <button id="prev_button" value="Prev">Prev</button>
+        <button id="next_button" value="Next">Next</button>
+    </div>
+</div>
+
 </body>
 </html>
