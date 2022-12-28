@@ -14,6 +14,7 @@ public class Agency {
     private String agencyName;
     private String city;
     private String state;
+    private String metro;
     private int urbanizedArea;
     private int urbanizedPopulation;
     private int servicePopulation;

@@ -73,6 +73,12 @@ public class DatabaseLoaderController {
         return ResponseEntity.ok("Created database");
     }
 
+    @PostMapping("/database/load_seed")
+    public ResponseEntity loadSeedData() throws FileNotFoundException {
+        databaseSchemaService.seedDatabase();
+        return ResponseEntity.ok("Data loaded successfully");
+    }
+
     @PostMapping("/database/truncate")
     public ResponseEntity truncateDatabase() throws FileNotFoundException  {
         boolean ok = databaseSchemaService.truncateDatabase();

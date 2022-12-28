@@ -35,6 +35,10 @@ function printResults() {
     console.log("resultsGlobal: " + resultsGlobal.length);
 }
 
+// Main method for updating the results table
+// Reads the input values, performs a fetch request, and loads the data for the
+// first page
+// why is this an async function?
 async function updateResultsTable() {
     const statisticElement = document.querySelector("#aggregate_statistic");
     const entityType = document.querySelector("#entity_type");
@@ -63,6 +67,8 @@ async function updateResultsTable() {
     setPage(CURRENT_PAGE);
 }
 
+// Loads the data for the results table for a given page number
+// The results data is stored globally
 function loadResults(pageNumber) {
     let startIndex = pageNumber * PAGINATION_LIMIT;
     let endIndex = Math.min(startIndex + PAGINATION_LIMIT, resultsGlobal.length);
@@ -76,6 +82,8 @@ function loadResults(pageNumber) {
     table.innerHTML = innerHTML;
 }
 
+// Update the enabled properties of the previous and next buttons
+// based on the page number
 function setPage(pageNumber) {
     let prevButton = document.querySelector("#prev_button");
     let nextButton = document.querySelector("#next_button");
@@ -95,6 +103,7 @@ function setPage(pageNumber) {
     }
 }
 
+// Get the table header row as a string
 function getResultsTableHeaderRow(entityValue, aggregateValue) {
     let str = "<tr class='row_header'>";
     str += "<td class='col_rank'></td>";
@@ -104,6 +113,7 @@ function getResultsTableHeaderRow(entityValue, aggregateValue) {
     return str;
 }
 
+// Get a particular row of the table
 function getHtmlRow(jsonElement, idx) {
     let str = "<tr>";
     str += "<td class='col_rank'>" + (idx + 1) + "</td>";
@@ -113,6 +123,8 @@ function getHtmlRow(jsonElement, idx) {
     return str;
 }
 
+// Performs the API call for retrieving the aggregate statistics date
+// Copied the headers and body response data from Postman
 async function loadAggregateStatistics(statistic, entity, travelMode) {
 
     var myHeaders = new Headers();

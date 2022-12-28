@@ -35,6 +35,13 @@ public class DatabaseSchemaService {
         }
     }
 
+    public boolean seedDatabase() throws FileNotFoundException {
+        ScriptRunner sr = new ScriptRunner(connection);
+        Reader reader = reader = new BufferedReader(new FileReader("src/main/resources/seed.sql"));
+        sr.runScript(reader);
+        return true;
+    }
+
     /**
      * Creates the database schema
      */

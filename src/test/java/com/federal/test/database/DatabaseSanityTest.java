@@ -74,6 +74,24 @@ public class DatabaseSanityTest {
     }
 
     @Test
+    public void testMasterDataAgency1() {
+        Agency agency = agencyDao.getAgencyByNtdId(1);
+        assertEquals("King County Department of Metro Transit", agency.getAgencyName());
+        assertEquals("seattle", agency.getCity().toLowerCase());
+        assertEquals("wa", agency.getState().toLowerCase());
+        assertEquals(3059393, agency.getUrbanizedPopulation());
+    }
+
+    @Test
+    public void testMasterDataAgency2() {
+        Agency agency = agencyDao.getAgencyByNtdId(99425);
+        assertEquals("Pomona Valley Transportation Authority", agency.getAgencyName());
+        assertEquals("la verne", agency.getCity().toLowerCase());
+        assertEquals("ca", agency.getState().toLowerCase());
+        assertEquals(12150996, agency.getUrbanizedPopulation());
+    }
+
+    @Test
     public void testMasterDataAgencyMode1() {
         List<AgencyMode> agencyModes = agencyModeDao.getAgencyModesByNtdId(1);
         assertEquals(9, agencyModes.size());

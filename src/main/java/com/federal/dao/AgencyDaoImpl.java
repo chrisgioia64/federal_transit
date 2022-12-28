@@ -24,6 +24,7 @@ public class AgencyDaoImpl implements AgencyDao {
     private static final String AGENCY_NAME = "agency_name";
     private static final String CITY = "city";
     private static final String STATE = "state";
+    private static final String METRO = "metro";
     private static final String URBANIZED_AREA = "urbanized_area";
     private static final String URBANIZED_POPULATION = "urbanized_population";
     private static final String SERVICE_POPULATION = "service_population";
@@ -51,6 +52,7 @@ public class AgencyDaoImpl implements AgencyDao {
             agency.setNtdId(rs.getInt(NTD_ID));
             agency.setCity(rs.getString(CITY));
             agency.setState(rs.getString(STATE));
+            agency.setMetro(rs.getString(METRO));
             agency.setUrbanizedArea(rs.getInt(URBANIZED_AREA));
             agency.setUrbanizedPopulation(rs.getInt(URBANIZED_POPULATION));
             agency.setServicePopulation(rs.getInt(SERVICE_POPULATION));
@@ -66,6 +68,7 @@ public class AgencyDaoImpl implements AgencyDao {
         params.put(AGENCY_NAME, agency.getAgencyName());
         params.put(CITY, agency.getCity());
         params.put(STATE, agency.getState());
+        params.put(METRO, agency.getMetro());
         params.put(URBANIZED_AREA, agency.getUrbanizedArea());
         params.put(URBANIZED_POPULATION, agency.getUrbanizedPopulation());
         params.put(SERVICE_POPULATION, agency.getServicePopulation());

@@ -4,6 +4,7 @@ create table if not exists agency (
     agency_name VARCHAR(255),
     city VARCHAR(255),
     state VARCHAR(255),
+    metro VARCHAR(255),
     urbanized_area bigint,
     urbanized_population bigint,
     service_population bigint
@@ -32,11 +33,17 @@ CREATE table if not exists transit_mode (
     description VARCHAR(255) NOT NULL
 );
 
+ALTER TABLE transit_mode
+ADD CONSTRAINT transit_mode_key UNIQUE (code);
+
 CREATE table if not exists tos (
 	id bigint NOT NULL PRIMARY KEY auto_increment,
 	code VARCHAR(255) NOT NULL,
     description VARCHAR(255) NOT NULL
 );
+
+ALTER TABLE tos
+ADD CONSTRAINT tos_key UNIQUE (code);
 
 CREATE table if not exists ridership_data (
 	id bigint NOT NULL PRIMARY KEY auto_increment,

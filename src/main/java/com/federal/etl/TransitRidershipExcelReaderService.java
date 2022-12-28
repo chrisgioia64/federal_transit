@@ -73,6 +73,7 @@ public class TransitRidershipExcelReaderService {
                 String tos = row.getCell(4).getStringCellValue();
                 String city = row.getCell(8).getStringCellValue();
                 String state = row.getCell(9).getStringCellValue();
+                String metro = row.getCell(11).getStringCellValue();
                 int uzaSquareMiles = getInteger(row.getCell(12));
                 int uzaPopulation = getInteger(row.getCell(13));
                 int servicePopulation = getInteger(row.getCell(15));
@@ -90,6 +91,7 @@ public class TransitRidershipExcelReaderService {
                     agency.setAgencyName(agencyName);
                     agency.setCity(city);
                     agency.setState(state);
+                    agency.setMetro(metro);
                     agency.setUrbanizedArea(uzaSquareMiles);
                     agency.setUrbanizedPopulation(uzaPopulation);
                     agency.setServicePopulation(servicePopulation);
