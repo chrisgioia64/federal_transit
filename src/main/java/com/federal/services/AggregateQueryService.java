@@ -1,10 +1,10 @@
 package com.federal.services;
 
-import com.federal.dao.*;
 import com.federal.model.AggregateEntity;
 import com.federal.model.AggregateStatistic;
 import com.federal.model.TravelMode;
-import lombok.Getter;
+import com.federal.dao.AggregateStatisticDao;
+import com.federal.dao.AggregateStatisticDaoImpl;
 import org.springframework.stereotype.Service;
 
 import javax.sql.DataSource;

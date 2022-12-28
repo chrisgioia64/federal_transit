@@ -1,6 +1,5 @@
 package com.federal.test.database;
 
-import com.federal.FederalTransitApplication;
 import com.federal.dao.*;
 import com.federal.etl.TransitRidershipExcelReaderService;
 import com.federal.model.Agency;
@@ -8,17 +7,10 @@ import com.federal.model.AgencyMode;
 import com.federal.model.RidershipData;
 import com.federal.web.DatabaseLoaderController;
 import lombok.extern.log4j.Log4j2;
-import org.junit.Before;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.ApplicationContext;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.testng.annotations.BeforeClass;
 
 import javax.sql.DataSource;
 

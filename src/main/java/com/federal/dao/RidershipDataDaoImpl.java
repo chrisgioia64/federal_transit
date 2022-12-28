@@ -1,6 +1,5 @@
 package com.federal.dao;
 
-import com.federal.model.AgencyMode;
 import com.federal.model.RidershipData;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.dao.DataAccessException;

@@ -1,11 +1,5 @@
 package com.federal.etl;
 
-import com.federal.dao.AgencyDao;
-import com.federal.dao.AgencyDaoImpl;
-import com.federal.dao.AgencyModeDao;
-import com.federal.dao.AgencyModeDaoImpl;
-import lombok.Getter;
-import lombok.extern.java.Log;
 import lombok.extern.log4j.Log4j2;
 import org.apache.ibatis.jdbc.ScriptRunner;
 import org.springframework.stereotype.Service;

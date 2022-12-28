@@ -2,7 +2,6 @@ package com.federal.dao;
 
 import com.federal.model.AggregateEntity;
 import com.federal.model.AggregateStatistic;
-import com.federal.model.RidershipData;
 import com.federal.model.TravelMode;
 import com.federal.services.AggregateResult;
 import org.springframework.jdbc.core.JdbcTemplate;
