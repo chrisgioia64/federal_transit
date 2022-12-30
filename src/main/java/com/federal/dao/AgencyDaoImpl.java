@@ -19,15 +19,15 @@ public class AgencyDaoImpl implements AgencyDao {
 
     public static final String TABLE_NAME = "Agency";
 
-    private static final String ID = "id";
-    private static final String NTD_ID = "ntd_id";
-    private static final String AGENCY_NAME = "agency_name";
-    private static final String CITY = "city";
-    private static final String STATE = "state";
-    private static final String METRO = "metro";
-    private static final String URBANIZED_AREA = "urbanized_area";
-    private static final String URBANIZED_POPULATION = "urbanized_population";
-    private static final String SERVICE_POPULATION = "service_population";
+    public static final String ID = "id";
+    public static final String NTD_ID = "ntd_id";
+    public static final String AGENCY_NAME = "agency_name";
+    public static final String CITY = "city";
+    public static final String STATE = "state";
+    public static final String METRO = "metro";
+    public static final String URBANIZED_AREA = "urbanized_area";
+    public static final String URBANIZED_POPULATION = "urbanized_population";
+    public static final String SERVICE_POPULATION = "service_population";
 
     private DataSource dataSource;
     private JdbcTemplate template;

@@ -1,0 +1,60 @@
+.state_title {
+    color: blue;
+    font-weight: bold;
+    font-size: 1.2em;
+}
+
+.state_card {
+    border-top: 1px solid black;
+}
+
+.metro_card_title {
+    background-color: rgb(255 245 174);
+    padding-top: 5px;
+    padding-bottom: 5px;
+    border-top: 1px solid rgb(100, 100, 100);
+    border-left: 1px solid rgb(100, 100, 100);
+    border-right: 1px solid rgb(100, 100, 100);
+    padding-left: 10px;
+}
+
+.metro_card {
+    background-color: 2px solid blue;
+}
+
+.metro_card_content {
+    background-color: rgb(240, 245, 255);
+    padding-bottom: 20px;
+}
+
+.metro_table {
+
+}
+
+.metro_table thead {
+    font-size: 0.9em;
+}
+
+.metro_table {
+    font-size: 0.8em;
+}
+
+.table_col_attribute {
+    width: 150px;
+}
+
+.table_col_total {
+    width: 100px;
+}
+
+.table_col_total_rank {
+    width: 50px;
+}
+
+.table_col_per_capita {
+    width: 70px;
+}
+
+.table_col_per_capita_rank {
+    width: 50px;
+}

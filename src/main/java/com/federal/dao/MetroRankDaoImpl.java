@@ -8,6 +8,7 @@ import org.springframework.jdbc.core.RowMapper;
 import javax.sql.DataSource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 
 public class MetroRankDaoImpl implements MetroRankDao {
 
@@ -27,6 +28,22 @@ public class MetroRankDaoImpl implements MetroRankDao {
     public MetroRankDaoImpl(DataSource dataSource) {
         this.dataSource = dataSource;
         this.template = new JdbcTemplate(dataSource);
+    }
+
+    public class StateMapper implements RowMapper<String> {
+        @Override
+        public String mapRow(ResultSet rs, int rowNum) throws SQLException {
+            String res = rs.getString(AgencyDaoImpl.STATE);
+            return res;
+        }
+    }
+
+    public class MetroMapper implements RowMapper<String> {
+        @Override
+        public String mapRow(ResultSet rs, int rowNum) throws SQLException {
+            String res = rs.getString(AgencyDaoImpl.METRO);
+            return res;
+        }
     }
 
     public class MetroRankInfoRowMapper implements RowMapper<MetroRankInfo> {
@@ -69,6 +86,19 @@ public class MetroRankDaoImpl implements MetroRankDao {
                 new MetroRankInfoRowMapper());
         info.setStatisticName(statistic.getDisplayName());
         return info;
+    }
+
+    @Override
+    public List<String> getStates() {
+        String sql = "SELECT DISTINCT(state) FROM agency ORDER BY state";
+        return template.query(sql, new StateMapper());
+    }
+
+    @Override
+    public List<String> getLargeMetropolitanAreasByState(String state) {
+        String sql = "SELECT DISTINCT(agency.metro) FROM agency WHERE state = ? " +
+                "AND agency.urbanized_population >= 500000 ORDER BY agency.metro;";
+        return template.query(sql, new MetroMapper(), state);
     }
 
 }

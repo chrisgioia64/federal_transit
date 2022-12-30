@@ -16,5 +16,15 @@ public class HtmlController {
         return "query.html";
     }
 
+    @GetMapping("/metro")
+    public String getMetroPage() {
+        return "metro.html";
+    }
+
+    // Tutorials
+    @GetMapping("/react-tutorial")
+    public String getReactTutorial() {
+        return "react-tutorial.html";
+    }
 
 }

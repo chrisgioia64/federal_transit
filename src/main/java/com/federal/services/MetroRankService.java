@@ -34,4 +34,12 @@ public class MetroRankService {
         list.add(dao.getRankInfo(metroName, AggregateStatistic.FARE));
         return list;
     }
+
+    public List<String> getStates() {
+        return dao.getStates();
+    }
+
+    public List<String> getLargeMetropolitanAreasByState(String state) {
+        return dao.getLargeMetropolitanAreasByState(state);
+    }
 }

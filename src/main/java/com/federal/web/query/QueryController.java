@@ -53,4 +53,16 @@ public class QueryController {
         return ResponseEntity.ok(list);
     }
 
+    @PostMapping("/query/states")
+    public ResponseEntity getStates() {
+        List<String> list = metroRankService.getStates();
+        return ResponseEntity.ok(list);
+    }
+
+    @PostMapping("/query/metro_by_state")
+    public ResponseEntity getMetropolitanAreaByState(@RequestBody StringHolder state) {
+        List<String> list = metroRankService.getLargeMetropolitanAreasByState(state.getValue());
+        return ResponseEntity.ok(list);
+    }
+
 }
