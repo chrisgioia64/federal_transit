@@ -170,12 +170,13 @@ function MetroAreaTablePopulationRow(props) {
 
 function MetroAreaTableRow(props) {
     let row = props.row;
+    let perCapita = Math.round(row.perCapitaAmount * 10) / 10.0;
     return (
         <tr>
                 <td className="table_col_attribute">{row.statisticName}</td>
                   <td className="table_col_total">{row.totalAmount.toLocaleString()}</td>
                   <td className="table_col_total_rank">{row.totalRank}</td>
-                  <td className="table_col_per_capita">{row.perCapitaAmount.toLocaleString()}</td>
+                  <td className="table_col_per_capita">{perCapita}</td>
                   <td className="table_col_per_capita_rank">{row.perCapitaRank}</td>
         </tr>
     )

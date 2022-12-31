@@ -64,6 +64,7 @@ async function updateResultsTable() {
 
     let table = document.querySelector("#result_table tbody");
     table.innerHTML = innerHTML;
+    CURRENT_PAGE = 1;
     setPage(CURRENT_PAGE);
 }
 

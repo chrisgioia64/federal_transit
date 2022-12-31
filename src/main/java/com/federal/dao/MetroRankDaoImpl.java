@@ -2,6 +2,7 @@ package com.federal.dao;
 
 import com.federal.model.MetroRankInfo;
 import com.federal.model.AggregateStatistic;
+import com.federal.model.TransitAggregateType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 
@@ -99,6 +100,49 @@ public class MetroRankDaoImpl implements MetroRankDao {
         String sql = "SELECT DISTINCT(agency.metro) FROM agency WHERE state = ? " +
                 "AND agency.urbanized_population >= 500000 ORDER BY agency.metro;";
         return template.query(sql, new MetroMapper(), state);
+    }
+
+    @Override
+    public MetroRankInfo getTransitInfo(String metroName,
+                                        AggregateStatistic statistic,
+                                        TransitAggregateType transitType) {
+        String sql = String.format("SELECT * FROM (SELECT metro, count, urbanized_population, total, rate, total_rank, pop_rank, " +
+                "ROW_NUMBER() OVER (ORDER BY rate DESC) rate_rank " +
+                " FROM (SELECT COUNT(*) AS count, agency.urbanized_population, agency.metro, SUM(agency_mode.%s) AS total, " +
+                "SUM(agency_mode.%s) / agency.urbanized_population AS rate, " +
+                "ROW_NUMBER() OVER (ORDER BY SUM(agency_mode.%s) DESC) total_rank, " +
+                "ROW_NUMBER() OVER (ORDER BY agency.urbanized_population DESC) pop_rank " +
+                "FROM agency INNER JOIN agency_mode " +
+                "WHERE agency_mode.ntd_id = agency.ntd_id " +
+                "%s" +
+                "GROUP BY agency.metro ORDER BY agency.urbanized_population DESC) AS sub " +
+                "WHERE urbanized_population >= 500000) AS sub2 " +
+                "WHERE metro = '%s' " +
+                "ORDER BY rate DESC;",
+                statistic.getColumnName(), statistic.getColumnName(), statistic.getColumnName(),
+                createOrStatement(transitType),
+                metroName
+                );
+        MetroRankInfo info = template.queryForObject(sql,
+                new MetroRankInfoRowMapper());
+        info.setStatisticName(statistic.getDisplayName());
+        info.setGroupType(transitType.getTransitTypeName());
+        return info;
+    }
+
+    private String createOrStatement(TransitAggregateType transitType) {
+        StringBuilder b = new StringBuilder();
+        if (transitType.getTransitModes().size() == 0) {
+            return b.toString();
+        }
+        b.append("AND ");
+        b.append("(");
+        for (String transitMode : transitType.getTransitModes()) {
+            b.append("agency_mode.mode = '" + transitMode + "' OR ");
+        }
+        b.replace(b.length()-3, b.length(), "");
+        b.append(") ");
+        return b.toString();
     }
 
 }

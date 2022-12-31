@@ -6,7 +6,8 @@ public enum AggregateEntity {
     AGENCY("agency_name"),
     CITY("city"),
     STATE("state"),
-    AGENCY_MODE("mode");
+    AGENCY_MODE("mode"),
+    METRO("metro");
 
     private AggregateEntity(String columnName) {
         this.columnName = columnName;

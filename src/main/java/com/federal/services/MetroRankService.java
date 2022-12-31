@@ -4,6 +4,7 @@ import com.federal.dao.MetroRankDao;
 import com.federal.dao.MetroRankDaoImpl;
 import com.federal.model.AggregateStatistic;
 import com.federal.model.MetroRankInfo;
+import com.federal.model.TransitAggregateType;
 import org.springframework.stereotype.Service;
 
 import javax.sql.DataSource;
@@ -41,5 +42,12 @@ public class MetroRankService {
 
     public List<String> getLargeMetropolitanAreasByState(String state) {
         return dao.getLargeMetropolitanAreasByState(state);
+    }
+
+    public List<MetroRankInfo> getTransitInfo(String metroName) {
+        List<MetroRankInfo> list = new LinkedList<>();
+        list.add(dao.getTransitInfo(metroName, AggregateStatistic.UPT, TransitAggregateType.RAIL));
+        list.add(dao.getTransitInfo(metroName, AggregateStatistic.UPT, TransitAggregateType.BUS));
+        return list;
     }
 }

@@ -65,4 +65,10 @@ public class QueryController {
         return ResponseEntity.ok(list);
     }
 
+    @PostMapping("/query/metro_rank/transit")
+    public ResponseEntity getMetroRankByTransitMode(@RequestBody StringHolder metroName) {
+        List<MetroRankInfo> list = metroRankService.getTransitInfo(metroName.getValue());
+        return ResponseEntity.ok(list);
+    }
+
 }
