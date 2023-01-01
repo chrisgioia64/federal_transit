@@ -1,8 +1,32 @@
-table#query_table {
-    border: 1px solid black;
+body {
+
 }
 
-table#result_table {
+h1 {
+  text-align: center;
+  color: blue;
+}
+
+#query_panel {
+  margin: 0 auto;
+  width: 400px;
+  border: 1px solid black;
+  padding: 5px;
+  border-radius: 0.3em;
+  border: 1px inset rgb(0,0,200);
+}
+
+
+#query_table {
+  text-align: center;
+}
+
+#query_table select {
+  width: 180px;
+}
+
+#result_panel {
+  margin: 0 auto;
 }
 
 #result_table .col_rank {
@@ -10,19 +34,23 @@ table#result_table {
 }
 
 #result_table .col_entity {
-    width: 300px;
+    width: 500px;
 }
 
 #result_table .col_statistic {
-    width: 140px;
+    width: 180px;
 }
 
 #result_table {
 /*     height: 350px; */
 }
 
+#result_table {
+  font-size: 0.9em;
+}
+
 #result_table tr {
-    height: 38px;
+    height: 20px;
 }
 
 #result_table .row_header {
@@ -31,12 +59,17 @@ table#result_table {
 }
 
 #results_panel {
+    margin: 0 auto;
     margin-top: 10px;
     border: 1px solid blue;
     border-radius: 0.3em;
     padding: 5px;
-    width: 480px;
-    background-color: rgb(240,240,240);
+    width: 680px;
+    background-color: rgb(245,245,245);
+}
+
+#pagination_subpanel {
+  display: none;
 }
 
 #pagination_subpanel button {

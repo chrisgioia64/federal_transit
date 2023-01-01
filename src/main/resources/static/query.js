@@ -30,6 +30,7 @@ var resultsGlobal = [];
 var CURRENT_PAGE = 0;
 var PAGINATION_LIMIT = 10;
 var PAGE_COUNT = 0;
+var datatable = null;
 
 function printResults() {
     console.log("resultsGlobal: " + resultsGlobal.length);
@@ -56,16 +57,26 @@ async function updateResultsTable() {
     resultsGlobal = json;
     PAGE_COUNT = Math.ceil(resultsGlobal.length / PAGINATION_LIMIT);
     console.log("pages: " + PAGE_COUNT);
-    let endIndex = Math.min(10, json.length);
+    let endIndex = Math.min(10000000, json.length);
     for (var i = 0; i < endIndex; i++) {
         htmlRow = getHtmlRow(json[i], i);
         innerHTML += htmlRow;
+    }
+
+    if (datatable != null) {
+        datatable.destroy();
+        // $('#result_table').empty();
+        console.log("destroy");
     }
 
     let table = document.querySelector("#result_table tbody");
     table.innerHTML = innerHTML;
     CURRENT_PAGE = 1;
     setPage(CURRENT_PAGE);
+    datatable = new DataTable('#result_table', {
+        destroy: true
+    });
+
 }
 
 // Loads the data for the results table for a given page number
