@@ -102,17 +102,19 @@ public class TransitRidershipExcelReaderService {
                     result.add(agencyName);
                 }
 
-                AgencyMode agencyMode = new AgencyMode();
-                agencyMode.setNtdId(ntdId);
-                agencyMode.setMode(mode);
-                agencyMode.setTypeOfService(tos);
-                agencyMode.setReportYear(mostRecentYear);
-                agencyMode.setNumberOfMonths(numberMonths);
-                agencyMode.setPassengerMiles(passengerMiles);
-                agencyMode.setUpt(upt);
-                agencyMode.setFares(fares);
-                agencyMode.setOperatingExpenses(operatingExpenses);
-                agencyModeDao.addAgencyMode(agencyMode);
+                if (mostRecentYear == 2021) {
+                    AgencyMode agencyMode = new AgencyMode();
+                    agencyMode.setNtdId(ntdId);
+                    agencyMode.setMode(mode);
+                    agencyMode.setTypeOfService(tos);
+                    agencyMode.setReportYear(mostRecentYear);
+                    agencyMode.setNumberOfMonths(numberMonths);
+                    agencyMode.setPassengerMiles(passengerMiles);
+                    agencyMode.setUpt(upt);
+                    agencyMode.setFares(fares);
+                    agencyMode.setOperatingExpenses(operatingExpenses);
+                    agencyModeDao.addAgencyMode(agencyMode);
+                }
 
                 log.info("Reading row number " + rowNumber);
                 rowNumber++;

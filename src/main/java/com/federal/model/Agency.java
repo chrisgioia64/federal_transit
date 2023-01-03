@@ -2,10 +2,12 @@ package com.federal.model;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import org.springframework.data.annotation.Id;
 
 @Getter
 @Setter
+@ToString
 public class Agency {
 
     private int id;
