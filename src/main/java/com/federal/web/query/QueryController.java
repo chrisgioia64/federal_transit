@@ -77,17 +77,28 @@ public class QueryController {
     }
 
     @PostMapping("/query/scatterplot")
-    public ResponseEntity loadMasterDatabase(@RequestBody ScatterplotQueryObject obj) {
-        AggregateStatistic stat = AggregateStatistic.valueOf(obj.getAggregateStatistic());
-        TransitAggregateType type = TransitAggregateType.valueOf(obj.getTransitAggregateType());
-        Integer populationLimit = obj.getPopulationLimit();
+    public ResponseEntity getScatterplot(@RequestBody ScatterplotQueryObject obj) {
+        log.info("Object: " + obj.toString());
+        List<ScatterplotEntity> entityList1 = getEntities(
+                obj.getAggregateStatistic1(), obj.getTransitAggregateType1(), obj.getPopulationLimit());
+        List<ScatterplotEntity> entityList2 = getEntities(
+                obj.getAggregateStatistic2(), obj.getTransitAggregateType2(), obj.getPopulationLimit());
+        List<ScatterplotMergedEntity> mergedEntities =
+                scatterplotQueryService.mergeLists(entityList1, entityList2);
+        return ResponseEntity.ok(mergedEntities);
+    }
+
+    private List<ScatterplotEntity> getEntities(String statistic,
+                                                String transitType, int populationLimit) {
+        AggregateStatistic stat = AggregateStatistic.valueOf(statistic);
+        TransitAggregateType type = TransitAggregateType.valueOf(transitType);
         List<ScatterplotEntity> list = new LinkedList<>();
         if (stat.equals(AggregateStatistic.POPULATION)) {
             list = scatterplotQueryService.getEntitiesForPopulation(populationLimit);
         } else {
             list = scatterplotQueryService.getEntities(stat, type, populationLimit);
         }
-        return ResponseEntity.ok(list);
+        return list;
     }
 
 }

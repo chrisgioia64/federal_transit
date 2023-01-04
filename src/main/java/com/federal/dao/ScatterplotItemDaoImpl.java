@@ -42,14 +42,14 @@ public class ScatterplotItemDaoImpl implements ScatterplotItemDao {
                                                TransitAggregateType type,
                                                int populationLimit) {
         String sql =
-                String.format("SELECT * FROM (SELECT metro, total, rate, " +
+                String.format("SELECT * FROM (SELECT metro, ifnull(total,0) AS total, ifnull(rate,0) AS rate,  " +
                 "ROW_NUMBER() OVER (ORDER BY rate DESC) rate_rank " +
                 " FROM (SELECT agency.metro, SUM(agency_mode.%s) AS total, agency.urbanized_population, " +
                 "SUM(agency_mode.%s) / agency.urbanized_population AS rate, " +
                 "ROW_NUMBER() OVER (ORDER BY SUM(agency_mode.%s) DESC) total_rank, " +
                 "ROW_NUMBER() OVER (ORDER BY agency.urbanized_population DESC) pop_rank " +
-                "FROM agency INNER JOIN agency_mode " +
-                "WHERE agency_mode.ntd_id = agency.ntd_id " +
+                "FROM agency LEFT JOIN agency_mode " +
+                "ON agency_mode.ntd_id = agency.ntd_id " +
                  " %s " +
                 "GROUP BY agency.metro ORDER BY agency.urbanized_population DESC) AS sub " +
                 "WHERE urbanized_population >= %d) AS sub2;",

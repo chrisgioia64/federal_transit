@@ -9,8 +9,12 @@ import lombok.ToString;
 @ToString
 public class ScatterplotQueryObject {
 
-    private String aggregateStatistic;
-    private String transitAggregateType;
+    private String aggregateStatistic1;
+    private String transitAggregateType1;
+
+    private String aggregateStatistic2;
+    private String transitAggregateType2;
+
     private int populationLimit;
 
 }
