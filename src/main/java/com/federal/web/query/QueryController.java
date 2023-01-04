@@ -7,6 +7,7 @@ import com.federal.model.*;
 import com.federal.services.AggregateQueryService;
 import com.federal.services.AggregateResult;
 import com.federal.services.MetroRankService;
+import com.federal.services.ScatterplotQueryService;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j;
 import lombok.extern.log4j.Log4j2;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.sql.DataSource;
+import java.util.LinkedList;
 import java.util.List;
 
 @CrossOrigin
@@ -29,10 +31,15 @@ public class QueryController {
     @Autowired
     private MetroRankService metroRankService;
 
+    @Autowired
+    private ScatterplotQueryService scatterplotQueryService;
+
     public QueryController(AggregateQueryService service,
-                           MetroRankService metroRankService) {
+                           MetroRankService metroRankService,
+                           ScatterplotQueryService scatterplotQueryService) {
         this.service = service;
         this.metroRankService = metroRankService;
+        this.scatterplotQueryService = scatterplotQueryService;
     }
 
     @PostMapping("/query/get_aggregate")
@@ -66,6 +73,20 @@ public class QueryController {
     @PostMapping("/query/metro_rank/transit")
     public ResponseEntity getMetroRankByTransitMode(@RequestBody StringHolder metroName) {
         List<MetroRankInfo> list = metroRankService.getTransitInfo(metroName.getValue());
+        return ResponseEntity.ok(list);
+    }
+
+    @PostMapping("/query/scatterplot")
+    public ResponseEntity loadMasterDatabase(@RequestBody ScatterplotQueryObject obj) {
+        AggregateStatistic stat = AggregateStatistic.valueOf(obj.getAggregateStatistic());
+        TransitAggregateType type = TransitAggregateType.valueOf(obj.getTransitAggregateType());
+        Integer populationLimit = obj.getPopulationLimit();
+        List<ScatterplotEntity> list = new LinkedList<>();
+        if (stat.equals(AggregateStatistic.POPULATION)) {
+            list = scatterplotQueryService.getEntitiesForPopulation(populationLimit);
+        } else {
+            list = scatterplotQueryService.getEntities(stat, type, populationLimit);
+        }
         return ResponseEntity.ok(list);
     }
 

@@ -114,7 +114,7 @@ public class MetroRankDaoImpl implements MetroRankDao {
                 "ROW_NUMBER() OVER (ORDER BY agency.urbanized_population DESC) pop_rank " +
                 "FROM agency INNER JOIN agency_mode " +
                 "WHERE agency_mode.ntd_id = agency.ntd_id " +
-                "%s" +
+                "%s " +
                 "GROUP BY agency.metro ORDER BY agency.urbanized_population DESC) AS sub " +
                 "WHERE urbanized_population >= 500000) AS sub2 " +
                 "WHERE metro = '%s' " +
@@ -130,8 +130,11 @@ public class MetroRankDaoImpl implements MetroRankDao {
         return info;
     }
 
-    private String createOrStatement(TransitAggregateType transitType) {
+    public static String createOrStatement(TransitAggregateType transitType) {
         StringBuilder b = new StringBuilder();
+        if (transitType.equals(TransitAggregateType.ALL)) {
+            return b.toString();
+        }
         if (transitType.getTransitModes().size() == 0) {
             return b.toString();
         }
