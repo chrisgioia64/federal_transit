@@ -1,22 +1,16 @@
 package com.federal.web.query;
 
-import com.federal.dao.*;
-import com.federal.etl.DatabaseSchemaService;
-import com.federal.etl.TransitRidershipExcelReaderService;
 import com.federal.model.*;
+import com.federal.model.web.*;
 import com.federal.services.AggregateQueryService;
 import com.federal.services.AggregateResult;
 import com.federal.services.MetroRankService;
 import com.federal.services.ScatterplotQueryService;
-import lombok.Getter;
-import lombok.extern.log4j.Log4j;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import javax.sql.DataSource;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -99,6 +93,24 @@ public class QueryController {
             list = scatterplotQueryService.getEntities(stat, type, populationLimit);
         }
         return list;
+    }
+
+    @PostMapping("/query/piechart")
+    public ResponseEntity getPieChart(@RequestBody PieChartQueryObject obj) {
+        String metropolitanArea = obj.getMetropolitanArea();
+        AggregateStatistic statistic = AggregateStatistic.valueOf(obj.getStatistic());
+        PieChartDatum datum = metroRankService.getAggregateAmount(metropolitanArea, statistic);
+        return ResponseEntity.ok(datum);
+    }
+
+    @PostMapping("/query/stacked_bar_chart")
+    public ResponseEntity getStackedBarChart(@RequestBody MetropolitanStatisticQueryObject obj) {
+        String metropolitanArea = obj.getMetropolitanArea();
+        AggregateStatistic statistic = AggregateStatistic.valueOf(obj.getStatistic());
+        List<TravelModeStatisticDatum> list = metroRankService.getTravelModeStatisticDatums(
+                metropolitanArea, statistic
+        );
+        return ResponseEntity.ok(list);
     }
 
 }

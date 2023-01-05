@@ -1,4 +1,4 @@
-package com.federal.model;
+package com.federal.model.web;
 
 import lombok.Getter;
 import lombok.Setter;

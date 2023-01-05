@@ -1,13 +1,11 @@
 package com.federal.services;
 
-import com.federal.dao.MetroRankDao;
-import com.federal.dao.MetroRankDaoImpl;
 import com.federal.dao.ScatterplotItemDao;
 import com.federal.dao.ScatterplotItemDaoImpl;
-import com.federal.model.AggregateStatistic;
-import com.federal.model.ScatterplotEntity;
-import com.federal.model.ScatterplotMergedEntity;
-import com.federal.model.TransitAggregateType;
+import com.federal.model.*;
+import com.federal.model.web.PieChartDatum;
+import com.federal.model.web.ScatterplotEntity;
+import com.federal.model.web.ScatterplotMergedEntity;
 import org.springframework.stereotype.Service;
 
 import javax.sql.DataSource;
@@ -63,4 +61,6 @@ public class ScatterplotQueryService {
         mergedEntity.setEntity2(entity2);
         return mergedEntity;
     }
+
+
 }

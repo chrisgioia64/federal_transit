@@ -1,8 +1,10 @@
 package com.federal.dao;
 
-import com.federal.model.MetroRankInfo;
+import com.federal.model.web.MetroRankInfo;
 import com.federal.model.AggregateStatistic;
 import com.federal.model.TransitAggregateType;
+import com.federal.model.web.TravelModeStatisticDatum;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 
@@ -11,6 +13,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
+@Log4j2
 public class MetroRankDaoImpl implements MetroRankDao {
 
     private DataSource dataSource;
@@ -25,6 +28,10 @@ public class MetroRankDaoImpl implements MetroRankDao {
     private final static String COL_RATE = "rate";
     private final static String COL_TOTAL_RANK = "total_rank";
     private final static String COL_RATE_RANK = "rate_rank";
+
+    private final static String COL_AGENCY_NAME = "agency_name";
+    private final static String COL_MODE = "mode";
+    private final static String COL_AMOUNT = "amount";
 
     public MetroRankDaoImpl(DataSource dataSource) {
         this.dataSource = dataSource;
@@ -146,6 +153,58 @@ public class MetroRankDaoImpl implements MetroRankDao {
         b.replace(b.length()-3, b.length(), "");
         b.append(") ");
         return b.toString();
+    }
+
+    @Override
+    public double getAggregateAmount(String metropolitanArea,
+                                     AggregateStatistic statistic, TransitAggregateType type) {
+        String sql = String.format("SELECT metro, SUM(agency_mode.%s) AS total " +
+                        "FROM agency LEFT JOIN agency_mode " +
+                        "ON agency_mode.ntd_id = agency.ntd_id " +
+                        "%s " +
+                        "WHERE agency.metro = '%s' " +
+                        "GROUP BY agency.metro " +
+                        "ORDER BY SUM(agency_mode.upt) DESC;",
+                statistic.getColumnName(),
+                MetroRankDaoImpl.createOrStatement(type),
+                metropolitanArea
+        );
+        List<Double> list = template.query(sql, new ScatterplotItemDaoImpl.AggregateStatisticDoubleMapper());
+        if (list.size() == 0) {
+            return 0.0;
+        } else if (list.size() == 1){
+            return list.get(0);
+        } else {
+            log.warn("There were " + list.size() + " elements returned by the query");
+            return list.get(0);
+        }
+    }
+
+    public static class TravelModeMapper implements RowMapper<TravelModeStatisticDatum> {
+
+        @Override
+        public TravelModeStatisticDatum mapRow(ResultSet rs, int rowNum) throws SQLException {
+            TravelModeStatisticDatum datum = new TravelModeStatisticDatum();
+            datum.setAgencyName(rs.getString(COL_AGENCY_NAME));
+            datum.setTravelMode(rs.getString(COL_MODE));
+            datum.setAmount(rs.getDouble(COL_AMOUNT));
+            return datum;
+        }
+    }
+
+    @Override
+    public List<TravelModeStatisticDatum> getTravelModeStatisticDatums(
+            String metropolitanArea, AggregateStatistic statistic) {
+        String sql = String.format("SELECT agency.metro, agency.agency_name, agency_mode.mode, SUM(agency_mode.%s) AS amount " +
+                "FROM agency INNER JOIN agency_mode " +
+                "ON agency.ntd_id = agency_mode.ntd_id " +
+                "WHERE metro = '%s' " +
+                "GROUP BY agency.agency_name, agency_mode.mode " +
+                "ORDER BY metro;",
+                statistic.getColumnName(), metropolitanArea);
+        List<TravelModeStatisticDatum> list
+                = template.query(sql, new TravelModeMapper());
+        return list;
     }
 
 }

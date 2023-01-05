@@ -1,8 +1,9 @@
 package com.federal.dao;
 
 import com.federal.model.AggregateStatistic;
-import com.federal.model.ScatterplotEntity;
+import com.federal.model.web.ScatterplotEntity;
 import com.federal.model.TransitAggregateType;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 
@@ -11,6 +12,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
+@Log4j2
 public class ScatterplotItemDaoImpl implements ScatterplotItemDao {
 
     private DataSource dataSource;
@@ -19,6 +21,8 @@ public class ScatterplotItemDaoImpl implements ScatterplotItemDao {
     private final static String COL_METRO = "metro";
     private final static String COL_RATE = "rate";
     private final static String COL_RATE_RANK = "rate_rank";
+
+    private final static String TOTAL = "total";
 
     public ScatterplotItemDaoImpl(DataSource dataSource) {
         this.dataSource = dataSource;
@@ -34,6 +38,14 @@ public class ScatterplotItemDaoImpl implements ScatterplotItemDao {
             entity.setTotalAmount(rs.getDouble(COL_RATE));
             entity.setTotalRank(rs.getInt(COL_RATE_RANK));
             return entity;
+        }
+    }
+
+    public static class AggregateStatisticDoubleMapper implements RowMapper<Double> {
+
+        @Override
+        public Double mapRow(ResultSet rs, int rowNum) throws SQLException {
+            return rs.getDouble(TOTAL);
         }
     }
 
@@ -81,4 +93,6 @@ public class ScatterplotItemDaoImpl implements ScatterplotItemDao {
         }
         return list;
     }
+
+
 }
