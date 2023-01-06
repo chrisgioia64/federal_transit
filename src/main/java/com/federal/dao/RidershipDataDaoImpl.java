@@ -94,8 +94,8 @@ public class RidershipDataDaoImpl implements RidershipDataDao {
 
     @Override
     public void addRidershipDataBatch(List<RidershipData> list) {
-        try {
-            Connection conn = DataSourceUtils.getConnection(dataSource);
+        try (Connection conn = DataSourceUtils.getConnection(dataSource)) {
+            log.info("Connection object for batch: " + conn.toString());
             String sql = String.format("INSERT INTO %s (%s, %s, %s, %s, %s) VALUES (?, ?, ?, ?, ?)",
                     TABLE_NAME, AGENCY_MODE_ID, TYPE, YEAR, MONTH, DATA);
             PreparedStatement ps = conn.prepareStatement(sql);
