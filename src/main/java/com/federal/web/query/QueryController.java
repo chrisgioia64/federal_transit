@@ -113,4 +113,27 @@ public class QueryController {
         return ResponseEntity.ok(list);
     }
 
+    @PostMapping("/query/agency_name_by_metro")
+    public ResponseEntity getAgencies(@RequestBody StringHolder obj) {
+        String metropolitanArea = obj.getValue();
+        List<AgencyDatum> list = metroRankService.getAgenciesForMetropolitanArea(
+                metropolitanArea);
+        return ResponseEntity.ok(list);
+    }
+
+    @PostMapping("/query/agency_modes")
+    public ResponseEntity getAgencyModes(@RequestBody StringHolder obj) {
+        int ntdId = Integer.parseInt(obj.getValue());
+        List<AgencyModeDatum> list = metroRankService.getAgencyModes(ntdId);
+        return ResponseEntity.ok(list);
+    }
+
+    @PostMapping("/query/ridership_data")
+    public ResponseEntity getRidershipData(@RequestBody RidershipDataQueryObject queryObj) {
+        List<RidershipData> list = metroRankService.getRidershipData(
+                queryObj.getNtdId(), queryObj.getMode(), queryObj.getTypeOfService(),
+                queryObj.getType());
+        return ResponseEntity.ok(list);
+    }
+
 }

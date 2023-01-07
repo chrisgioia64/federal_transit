@@ -35,6 +35,8 @@ public class AgencyModeDaoImpl implements AgencyModeDao {
     private SimpleJdbcInsert insert;
 
     public AgencyModeDaoImpl(DataSource dataSource) {
+        log.info("Agency Mode Dao - Data source: " + dataSource.toString());
+
         this.dataSource = dataSource;
         this.template = new JdbcTemplate(dataSource);
         this.insert = new SimpleJdbcInsert(dataSource).withTableName(TABLE_NAME)
@@ -96,6 +98,9 @@ public class AgencyModeDaoImpl implements AgencyModeDao {
     @Override
     public Integer getId(int ntdId, String mode, String typeOfService) {
         AgencyMode obj = getAgencyMode(ntdId, mode, typeOfService);
+        if (obj == null) {
+            return -1;
+        }
         return obj.getId();
     }
 
@@ -104,10 +109,14 @@ public class AgencyModeDaoImpl implements AgencyModeDao {
         String sql = String.format(
                 "SELECT * FROM %s WHERE %s = ? AND %s = ? AND %s = ?;",
                 TABLE_NAME, NTD_ID, MODE, TYPE_OF_SERVICE);
-        AgencyMode obj = template.queryForObject(sql,
+        List<AgencyMode> list = template.query(sql,
                 new AgencyModeDaoImpl.AgencyModeRowMapper(),
                 ntdId, mode, typeOfService);
-        return obj;
+        if (list.size() == 1) {
+            return list.get(0);
+        } else {
+            return null;
+        }
     }
 
 }

@@ -1,5 +1,7 @@
 package com.federal.dao;
 
+import com.federal.model.web.AgencyDatum;
+import com.federal.model.web.AgencyModeDatum;
 import com.federal.model.web.MetroRankInfo;
 import com.federal.model.AggregateStatistic;
 import com.federal.model.TransitAggregateType;
@@ -34,5 +36,12 @@ public interface MetroRankDao {
     public List<TravelModeStatisticDatum> getTravelModeStatisticDatums(
             String metropolitanArea,
             AggregateStatistic statistic);
+
+    public List<AgencyDatum> getAgenciesForMetropolitanArea(String metropolitanArea);
+
+    public List<AgencyModeDatum> getAgencyModes(String agencyName);
+
+    public List<AgencyModeDatum> getAgencyModes(int ntdId);
+
 
 }

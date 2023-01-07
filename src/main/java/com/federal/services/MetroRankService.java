@@ -2,11 +2,12 @@ package com.federal.services;
 
 import com.federal.dao.MetroRankDao;
 import com.federal.dao.MetroRankDaoImpl;
+import com.federal.dao.RidershipDataDao;
+import com.federal.dao.RidershipDataDaoImpl;
 import com.federal.model.AggregateStatistic;
-import com.federal.model.web.MetroRankInfo;
+import com.federal.model.RidershipData;
+import com.federal.model.web.*;
 import com.federal.model.TransitAggregateType;
-import com.federal.model.web.PieChartDatum;
-import com.federal.model.web.TravelModeStatisticDatum;
 import org.springframework.stereotype.Service;
 
 import javax.sql.DataSource;
@@ -18,10 +19,12 @@ public class MetroRankService {
     private DataSource dataSource;
 
     private MetroRankDao dao;
+    private RidershipDataDao ridershipDataDao;
 
     public MetroRankService(DataSource dataSource) {
         this.dataSource = dataSource;
         this.dao = new MetroRankDaoImpl(dataSource);
+        this.ridershipDataDao = new RidershipDataDaoImpl(dataSource);
     }
 
     public MetroRankInfo getRankInfo(String metroName, AggregateStatistic statistic) {
@@ -135,4 +138,20 @@ public class MetroRankService {
         return OTHER;
     }
 
+    public List<AgencyDatum> getAgenciesForMetropolitanArea(String metropolitanArea) {
+        return dao.getAgenciesForMetropolitanArea(metropolitanArea);
+    }
+
+    public List<AgencyModeDatum> getAgencyModes(String agencyName) {
+        return dao.getAgencyModes(agencyName);
+    }
+
+    public List<AgencyModeDatum> getAgencyModes(int ntdId) {
+        return dao.getAgencyModes(ntdId);
+    }
+
+    public List<RidershipData> getRidershipData(int ntdId, String mode,
+                                                String typeOfService, String type) {
+        return ridershipDataDao.getRidershipData(ntdId, mode, typeOfService, type);
+    }
 }

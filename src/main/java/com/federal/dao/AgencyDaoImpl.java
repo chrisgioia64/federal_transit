@@ -35,7 +35,7 @@ public class AgencyDaoImpl implements AgencyDao {
 
     public AgencyDaoImpl(DataSource dataSource) {
         this.dataSource = dataSource;
-        System.out.println("Data source: " + dataSource);
+        log.info("Agency Dao - Data source: " + dataSource.toString());
         this.template = new JdbcTemplate(dataSource);
         this.insert = new SimpleJdbcInsert(dataSource).withTableName(TABLE_NAME)
                 .usingGeneratedKeyColumns(ID);

@@ -13,4 +13,8 @@ public interface RidershipDataDao {
     public RidershipData getRidershipData(int ntdId, String mode, String typeOfService,
                                           int month, int year, String type);
 
+    public List<RidershipData> getRidershipData(int ntdId,
+                                                String mode, String typeOfService,
+                                                String type);
+
 }

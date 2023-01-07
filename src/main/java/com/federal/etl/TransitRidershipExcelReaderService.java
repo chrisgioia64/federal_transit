@@ -181,6 +181,10 @@ public class TransitRidershipExcelReaderService {
             String tos = row.getCell(8).getStringCellValue();
             long time = System.currentTimeMillis();
             Integer modeId = agencyModeDao.getId(ntdId, mode, tos);
+            if (modeId == -1) {
+                rowNumber++;
+                continue;
+            }
             getIdTime += (System.currentTimeMillis() - time);
 
             int startCol = 9;

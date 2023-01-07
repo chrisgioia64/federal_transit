@@ -1,5 +1,7 @@
 package com.federal.dao;
 
+import com.federal.model.web.AgencyDatum;
+import com.federal.model.web.AgencyModeDatum;
 import com.federal.model.web.MetroRankInfo;
 import com.federal.model.AggregateStatistic;
 import com.federal.model.TransitAggregateType;
@@ -32,8 +34,11 @@ public class MetroRankDaoImpl implements MetroRankDao {
     private final static String COL_AGENCY_NAME = "agency_name";
     private final static String COL_MODE = "mode";
     private final static String COL_AMOUNT = "amount";
+    private final static String COL_TYPE_OF_SERVICE = "type_of_service";
+    private final static String COL_NTD_ID = "ntd_id";
 
     public MetroRankDaoImpl(DataSource dataSource) {
+        log.info("Metro Rank Data source: " + dataSource);
         this.dataSource = dataSource;
         this.template = new JdbcTemplate(dataSource);
     }
@@ -206,5 +211,57 @@ public class MetroRankDaoImpl implements MetroRankDao {
                 = template.query(sql, new TravelModeMapper());
         return list;
     }
+
+    public static class AgencyDatumMapper implements RowMapper<AgencyDatum> {
+
+        @Override
+        public AgencyDatum mapRow(ResultSet rs, int rowNum) throws SQLException {
+            AgencyDatum datum = new AgencyDatum();
+            datum.setAgencyName(rs.getString(COL_AGENCY_NAME));
+            datum.setNtdId(rs.getInt(COL_NTD_ID));
+            return datum;
+        }
+    }
+
+    @Override
+    public List<AgencyDatum> getAgenciesForMetropolitanArea(String metropolitanArea) {
+        String sql = String.format("SELECT DISTINCT(agency_name), SUM(agency_mode.upt), agency.ntd_id " +
+                        "FROM agency " +
+                "INNER JOIN agency_mode ON agency.ntd_id = agency_mode.ntd_id " +
+                "WHERE metro = '%s'" +
+                "GROUP BY agency_name ORDER BY SUM(agency_mode.upt) DESC; ",
+                metropolitanArea);
+        return template.query(sql, new AgencyDatumMapper());
+    }
+
+    public static class AgencyModeDatumMapper implements RowMapper<AgencyModeDatum> {
+
+        @Override
+        public AgencyModeDatum mapRow(ResultSet rs, int rowNum) throws SQLException {
+            AgencyModeDatum datum = new AgencyModeDatum();
+            datum.setAgencyName(rs.getString(COL_AGENCY_NAME));
+            datum.setMode(rs.getString(COL_MODE));
+            datum.setTypeOfService(rs.getString(COL_TYPE_OF_SERVICE));
+            return datum;
+        }
+    }
+
+    @Override
+    public List<AgencyModeDatum> getAgencyModes(String agencyName) {
+        String sql = String.format("SELECT agency_name, mode, type_of_service FROM agency " +
+                "INNER JOIN agency_mode ON agency.ntd_id = agency_mode.ntd_id " +
+                "WHERE agency_name = '%s'", agencyName);
+        return template.query(sql, new AgencyModeDatumMapper());
+    }
+
+    @Override
+    public List<AgencyModeDatum> getAgencyModes(int ntdId) {
+        String sql = String.format("SELECT agency_name, mode, type_of_service FROM agency " +
+                "INNER JOIN agency_mode ON agency.ntd_id = agency_mode.ntd_id " +
+                "WHERE agency.ntd_id = %d", ntdId);
+        return template.query(sql, new AgencyModeDatumMapper());
+    }
+
+
 
 }
