@@ -152,4 +152,12 @@ public class QueryController {
         return ResponseEntity.ok(list);
     }
 
+    @PostMapping("/query/ridership_data_month")
+    public ResponseEntity getRidershipDataByMonth(@RequestBody RidershipDataQueryObject queryObj) {
+        List<RidershipData> list = metroRankService.getRidershipDataByMonth(
+                queryObj.getNtdId(), queryObj.getMode(), queryObj.getTypeOfService(),
+                queryObj.getType());
+        return ResponseEntity.ok(list);
+    }
+
 }

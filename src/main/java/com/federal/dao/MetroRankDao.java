@@ -48,7 +48,6 @@ public interface MetroRankDao {
     /**
      * Used for generating the time series data
      */
-
     public List<AgencyDatum> getAgenciesForMetropolitanArea(String metropolitanArea);
 
     public List<AgencyModeDatum> getAgencyModes(String agencyName);

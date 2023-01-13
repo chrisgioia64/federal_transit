@@ -185,4 +185,10 @@ public class MetroRankService {
                                                 String typeOfService, String type) {
         return ridershipDataDao.getRidershipData(ntdId, mode, typeOfService, type);
     }
+
+    public List<RidershipData> getRidershipDataByMonth(int ntdId, String mode,
+                                                       String typeOfService, String type) {
+        return ridershipDataDao.getRidershipDataByMonth(ntdId, mode, typeOfService, type);
+    }
+
 }

@@ -204,4 +204,17 @@ public class RidershipDataDaoImpl implements RidershipDataDao {
                 ntdId, mode, typeOfService, type);
     }
 
+    @Override
+    public List<RidershipData> getRidershipDataByMonth(int ntdId, String mode,
+                                                       String typeOfService, String type) {
+        String sql = "SELECT ridership_data.id, agency_mode_id, type, ntd_id, mode, type_of_service, month, year, SUM(data) / COUNT(data) AS data " +
+                "FROM agency_mode INNER JOIN ridership_data " +
+                "WHERE agency_mode.id = ridership_data.agency_mode_id " +
+                "AND agency_mode.ntd_id = ? AND agency_mode.mode = ? AND agency_mode.type_of_service = ? " +
+                "AND ridership_data.type = ? " +
+                "GROUP BY month ORDER BY month ASC;";
+        return template.query(sql, new RidershipDataDaoMapper(),
+                ntdId, mode, typeOfService, type);
+    }
+
 }
