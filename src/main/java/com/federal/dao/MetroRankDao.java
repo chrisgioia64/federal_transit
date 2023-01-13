@@ -37,6 +37,18 @@ public interface MetroRankDao {
             String metropolitanArea,
             AggregateStatistic statistic);
 
+    public List<TravelModeStatisticDatum> getTravelModeStatisticDatumsByYear(
+            String metropolitanArea,
+            int year,
+            String ridershipDataType
+    );
+
+    public List<Integer> getAvailableYears(String metropolitanArea, String ridershipDataType);
+
+    /**
+     * Used for generating the time series data
+     */
+
     public List<AgencyDatum> getAgenciesForMetropolitanArea(String metropolitanArea);
 
     public List<AgencyModeDatum> getAgencyModes(String agencyName);

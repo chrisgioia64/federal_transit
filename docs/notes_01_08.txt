@@ -1,0 +1,53 @@
+query.html
+
+right-justify
+Text-align: right;
+
+
+download as csv;
+
+white background... for 100 entries, it must go down with table
+
+the height of a table containing a single cell should not be fixed
+
+metro.html
+--------------------------
+
+The label for the "UPT by Travel Mode" graph should be outside the pie chart
+
+More spacing between the different graph divs
+
+Align detail right
+
+Add a control to filter the ridership of graph 2 by year (use monthly ridership data)
+
+Add tooltip to show ridership amounts for graph 3
+
+
+-------------------------------
+
+1/10 --- Call with PHill
+
+They don't want to just use MySQL.
+They use Redis and NoSQL.
+
+
+Take a lot of time you are writing to MySQL
+
+Use student email for Intellij Ultimate. give you 1 year once you signed up.
+
+Pretty important to do the cloud -- AWS/Azure
+Have you worked on a project on the AWS.. S3 bucket
+
+Try to host this project on a cloud provider..
+
+look into some podcasts
+
+Angular and Spring are a good combination
+
+Tmobile developer --
+
+MERN (Mongo, Express, React Node)
+MEAN -- angular
+
+Knowing React will help with smaller/mid companies

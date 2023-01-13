@@ -37,6 +37,8 @@ public class MetroRankDaoImpl implements MetroRankDao {
     private final static String COL_TYPE_OF_SERVICE = "type_of_service";
     private final static String COL_NTD_ID = "ntd_id";
 
+    private final static String COL_YEAR = "year";
+
     public MetroRankDaoImpl(DataSource dataSource) {
         log.info("Metro Rank Data source: " + dataSource);
         this.dataSource = dataSource;
@@ -210,6 +212,42 @@ public class MetroRankDaoImpl implements MetroRankDao {
         List<TravelModeStatisticDatum> list
                 = template.query(sql, new TravelModeMapper());
         return list;
+    }
+
+    @Override
+    public List<TravelModeStatisticDatum> getTravelModeStatisticDatumsByYear(String metropolitanArea,
+                                                                             int year, String ridershipDataType) {
+        String sql = String.format("Select agency_name, mode, type_of_service, agency_mode_id, year, month, data AS amount " +
+                "FROM agency INNER JOIN agency_mode " +
+                "ON agency.ntd_id = agency_mode.ntd_id " +
+                "INNER JOIN ridership_data " +
+                "ON agency_mode.id = ridership_data.agency_mode_id " +
+                "WHERE agency.metro = '%s' AND year = %d " +
+                "AND type = '%s' " +
+                "GROUP BY agency_mode_id, mode, type_of_service, year ",
+                metropolitanArea, year, ridershipDataType);
+        List<TravelModeStatisticDatum> list
+                = template.query(sql, new TravelModeMapper());
+        return list;
+    }
+
+    public static class YearMapper implements RowMapper<Integer> {
+        @Override
+        public Integer mapRow(ResultSet rs, int rowNum) throws SQLException {
+            return rs.getInt(COL_YEAR);
+        }
+    }
+
+    @Override
+    public List<Integer> getAvailableYears(String metropolitanArea, String ridershipDataType) {
+        String sql = String.format("Select year FROM agency INNER JOIN agency_mode " +
+                "ON agency.ntd_id = agency_mode.ntd_id " +
+                "INNER JOIN ridership_data " +
+                "ON agency_mode.id = ridership_data.agency_mode_id " +
+                "WHERE agency.metro = '%s' AND type = '%s' " +
+                "GROUP BY year " +
+                "ORDER BY year desc;", metropolitanArea, ridershipDataType);
+        return template.query(sql, new YearMapper());
     }
 
     public static class AgencyDatumMapper implements RowMapper<AgencyDatum> {

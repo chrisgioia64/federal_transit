@@ -113,6 +113,22 @@ public class QueryController {
         return ResponseEntity.ok(list);
     }
 
+    @PostMapping("/query/stacked_bar_chart_by_year")
+    public ResponseEntity getStackedBarChartByYear(@RequestBody MetropolitanStatisticYearQueryObject obj) {
+        String metropolitanArea = obj.getMetropolitanArea();
+        List<TravelModeStatisticDatum> list = metroRankService.getTravelModeStatisticDatums(
+                metropolitanArea, obj.getStatistic(), obj.getYear()
+        );
+        return ResponseEntity.ok(list);
+    }
+
+    @PostMapping("/query/get_years_of_metro")
+    public ResponseEntity getYearsForMetropolitanArea(@RequestBody MetropolitanStatisticQueryObject obj) {
+        String metropolitanArea = obj.getMetropolitanArea();
+        List<Integer> list = metroRankService.getAvailableYears(metropolitanArea, obj.getStatistic());
+        return ResponseEntity.ok(list);
+    }
+
     @PostMapping("/query/agency_name_by_metro")
     public ResponseEntity getAgencies(@RequestBody StringHolder obj) {
         String metropolitanArea = obj.getValue();

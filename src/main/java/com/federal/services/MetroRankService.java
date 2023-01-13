@@ -90,6 +90,31 @@ public class MetroRankService {
     private final static String OTHER = "other";
 
     public List<TravelModeStatisticDatum> getTravelModeStatisticDatums(
+            String metropolitanArea, String ridershipDataType, int year) {
+        List<TravelModeStatisticDatum> list =
+                dao.getTravelModeStatisticDatumsByYear(metropolitanArea, year, ridershipDataType);
+        Set<String> agencyNames = new HashSet<>();
+        for (TravelModeStatisticDatum datum : list) {
+            agencyNames.add(datum.getAgencyName());
+        }
+        Map<String, Map<String, Double>> map = new HashMap<>();
+        for (String agencyName : agencyNames) {
+            Map<String, Double> innerMap = new HashMap<>();
+            innerMap.put(TransitAggregateType.BUS.getTransitTypeName(), 0.0);
+            innerMap.put(TransitAggregateType.RAIL.getTransitTypeName(), 0.0);
+            innerMap.put(TransitAggregateType.DEMAND.getTransitTypeName(), 0.0);
+            innerMap.put(OTHER, 0.0);
+            map.put(agencyName, innerMap);
+        }
+        for (TravelModeStatisticDatum datum : list) {
+            String type = getTransitType(datum);
+            double current = map.get(datum.getAgencyName()).get(type);
+            map.get(datum.getAgencyName()).put(type, current + datum.getAmount());
+        }
+        return createFromMap(map);
+    }
+
+    public List<TravelModeStatisticDatum> getTravelModeStatisticDatums(
             String metropolitanArea, AggregateStatistic statistic) {
         List<TravelModeStatisticDatum> list =
                 dao.getTravelModeStatisticDatums(metropolitanArea, statistic);
@@ -112,6 +137,10 @@ public class MetroRankService {
             map.get(datum.getAgencyName()).put(type, current + datum.getAmount());
         }
         return createFromMap(map);
+    }
+
+    public List<Integer> getAvailableYears(String metropolitanArea, String ridershipDataType) {
+        return dao.getAvailableYears(metropolitanArea, ridershipDataType);
     }
 
     public List<TravelModeStatisticDatum> createFromMap(Map<String, Map<String, Double>> map) {
@@ -141,6 +170,8 @@ public class MetroRankService {
     public List<AgencyDatum> getAgenciesForMetropolitanArea(String metropolitanArea) {
         return dao.getAgenciesForMetropolitanArea(metropolitanArea);
     }
+
+    // Service methods for the time series data
 
     public List<AgencyModeDatum> getAgencyModes(String agencyName) {
         return dao.getAgencyModes(agencyName);
