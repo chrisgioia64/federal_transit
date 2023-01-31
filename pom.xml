@@ -17,6 +17,8 @@
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
+<!--        <maven.compiler.release>11</maven.compiler.release>-->
+<!--        <java.version>11</java.version>-->
     </properties>
 
     <dependencies>
@@ -110,6 +112,7 @@
                 </configuration>
             </plugin>
         </plugins>
+        <finalName>spring-boot-aws-exe</finalName>
     </build>
 
 </project>

@@ -16,7 +16,7 @@ import java.util.Map;
 @Log4j2
 public class AgencyModeDaoImpl implements AgencyModeDao {
 
-    public static final String TABLE_NAME = "Agency_Mode";
+    public static final String TABLE_NAME = "agency_mode";
 
     private static final String ID = "id";
     private static final String NTD_ID = "ntd_id";

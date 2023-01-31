@@ -22,7 +22,7 @@ import java.util.Map;
 @Log4j2
 public class RidershipDataDaoImpl implements RidershipDataDao {
 
-    public static final String TABLE_NAME = "Ridership_Data";
+    public static final String TABLE_NAME = "ridership_data";
 
     private static final String ID = "id";
     private static final String AGENCY_MODE_ID = "agency_mode_id";

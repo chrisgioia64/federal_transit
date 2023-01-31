@@ -15,7 +15,7 @@ import java.util.List;
 
 public class AggregateStatisticDaoImpl implements AggregateStatisticDao {
 
-    public static final String TABLE_NAME = "Agency";
+    public static final String TABLE_NAME = "agency";
 
     private static final String ID = "id";
     private static final String NTD_ID = "ntd_id";
