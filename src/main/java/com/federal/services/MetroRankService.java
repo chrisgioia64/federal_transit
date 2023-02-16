@@ -48,6 +48,10 @@ public class MetroRankService {
         return dao.getLargeMetropolitanAreasByState(state);
     }
 
+    public List<String> getMetropolitanAreas() {
+        return dao.getMetropolitanAreas();
+    }
+
     public List<MetroRankInfo> getTransitInfo(String metroName) {
         List<MetroRankInfo> list = new LinkedList<>();
         list.add(dao.getTransitInfo(metroName, AggregateStatistic.UPT, TransitAggregateType.RAIL));

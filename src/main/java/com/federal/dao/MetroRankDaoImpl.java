@@ -117,6 +117,13 @@ public class MetroRankDaoImpl implements MetroRankDao {
     }
 
     @Override
+    public List<String> getMetropolitanAreas() {
+        String sql = "SELECT DISTINCT(agency.metro) FROM agency WHERE " +
+                " agency.urbanized_population >= 500000 ORDER BY agency.metro;";
+        return template.query(sql, new MetroMapper());
+    }
+
+    @Override
     public MetroRankInfo getTransitInfo(String metroName,
                                         AggregateStatistic statistic,
                                         TransitAggregateType transitType) {
@@ -217,7 +224,7 @@ public class MetroRankDaoImpl implements MetroRankDao {
     @Override
     public List<TravelModeStatisticDatum> getTravelModeStatisticDatumsByYear(String metropolitanArea,
                                                                              int year, String ridershipDataType) {
-        String sql = String.format("Select agency_name, mode, type_of_service, agency_mode_id, year, month, data AS amount " +
+        String sql = String.format("Select agency_name, mode, type_of_service, agency_mode_id, year, month, SUM(data) AS amount " +
                 "FROM agency INNER JOIN agency_mode " +
                 "ON agency.ntd_id = agency_mode.ntd_id " +
                 "INNER JOIN ridership_data " +

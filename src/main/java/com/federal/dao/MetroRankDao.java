@@ -20,6 +20,8 @@ public interface MetroRankDao {
 
     public List<String> getLargeMetropolitanAreasByState(String state);
 
+    public List<String> getMetropolitanAreas();
+
     MetroRankInfo getTransitInfo(String metroName, AggregateStatistic statistic,
                                  TransitAggregateType transitType);
 

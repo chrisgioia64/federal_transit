@@ -1,0 +1,36 @@
+Query view:
+
+Ability to download (e.g. as a csv)
+right-justify the numbers
+alternative coloration, make the rows less tall (make 20 instead of 10)
+I could center the div..
+Title should be "National Transit Database"
+I can have a "Last" button to go to last page.
+
+Get it onto one line by making font size smaller and the table smaller.
+
+Data Tables
+https://datatables.net/
+
+https://wpdatatables.com/javascript-data-table/
+
+Only include master data for 2021
+
+Metro view:
+All the numeric columns should be right-justified
+Show the metropolitan areas on a map
+
+datawrapper.de
+Google Maps API -- pay to play
+OpenStreetMap 
+OpenBox
+
+
+Command line over API calls -- package it up..
+--- wipe db clean and do it now
+
+
+--------------------------
+Notes from 1/4
+
+1. Papa said to add a "pie chart" to describe the transit options.
