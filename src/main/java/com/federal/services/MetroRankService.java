@@ -1,9 +1,6 @@
 package com.federal.services;
 
-import com.federal.dao.MetroRankDao;
-import com.federal.dao.MetroRankDaoImpl;
-import com.federal.dao.RidershipDataDao;
-import com.federal.dao.RidershipDataDaoImpl;
+import com.federal.dao.*;
 import com.federal.model.AggregateStatistic;
 import com.federal.model.RidershipData;
 import com.federal.model.web.*;
@@ -20,11 +17,21 @@ public class MetroRankService {
 
     private MetroRankDao dao;
     private RidershipDataDao ridershipDataDao;
+    private MetroSummaryDao metroSummaryDao;
 
     public MetroRankService(DataSource dataSource) {
         this.dataSource = dataSource;
         this.dao = new MetroRankDaoImpl(dataSource);
         this.ridershipDataDao = new RidershipDataDaoImpl(dataSource);
+        this.metroSummaryDao = new MetroSummaryDaoImpl(dataSource);
+    }
+
+    public String getSummary() {
+        return metroSummaryDao.getSummary();
+    }
+
+    public String getSummaryAgencies() {
+        return metroSummaryDao.getUptUsageSummary();
     }
 
     public MetroRankInfo getRankInfo(String metroName, AggregateStatistic statistic) {

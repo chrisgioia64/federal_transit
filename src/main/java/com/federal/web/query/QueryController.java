@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.LinkedList;
 import java.util.List;
 
-@CrossOrigin
+@CrossOrigin(origins="*")
 @RestController
 @Log4j2
 public class QueryController {
@@ -164,6 +164,18 @@ public class QueryController {
                 queryObj.getNtdId(), queryObj.getMode(), queryObj.getTypeOfService(),
                 queryObj.getType());
         return ResponseEntity.ok(list);
+    }
+
+    @PostMapping("/query/summary")
+    public ResponseEntity getSummary() {
+        String summary = metroRankService.getSummary();
+        return ResponseEntity.ok(summary);
+    }
+
+    @PostMapping("/query/summary_agency")
+    public ResponseEntity getSummaryAgency() {
+        String summary = metroRankService.getSummaryAgencies();
+        return ResponseEntity.ok(summary);
     }
 
 }
