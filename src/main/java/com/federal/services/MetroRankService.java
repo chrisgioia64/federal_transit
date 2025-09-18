@@ -202,4 +202,8 @@ public class MetroRankService {
         return ridershipDataDao.getRidershipDataByMonth(ntdId, mode, typeOfService, type);
     }
 
+    public List<AgencyData> getAgencyDatums(String metropolitanArea) {
+        return dao.getAgencyDatums(metropolitanArea);
+    }
+
 }

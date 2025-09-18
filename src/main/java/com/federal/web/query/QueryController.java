@@ -178,4 +178,16 @@ public class QueryController {
         return ResponseEntity.ok(summary);
     }
 
+    @PostMapping("/query/agency_info")
+    public ResponseEntity getAgencyInformation() {
+        String summary = metroRankService.getSummaryAgencies();
+        return ResponseEntity.ok(summary);
+    }
+
+    @PostMapping("/query/agency_data")
+    public ResponseEntity getAgencyData(@RequestBody StringHolder obj) {
+        List<AgencyData> datums = metroRankService.getAgencyDatums(obj.getValue());
+        return ResponseEntity.ok(datums);
+    }
+
 }

@@ -1,11 +1,8 @@
 package com.federal.dao;
 
-import com.federal.model.web.AgencyDatum;
-import com.federal.model.web.AgencyModeDatum;
-import com.federal.model.web.MetroRankInfo;
+import com.federal.model.web.*;
 import com.federal.model.AggregateStatistic;
 import com.federal.model.TransitAggregateType;
-import com.federal.model.web.TravelModeStatisticDatum;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -38,6 +35,14 @@ public class MetroRankDaoImpl implements MetroRankDao {
     private final static String COL_NTD_ID = "ntd_id";
 
     private final static String COL_YEAR = "year";
+
+    private final static String COL_OPERATION_EXPENSES = "operating_total";
+    private final static String COL_COST_PER_PERSON = "cost_per_person";
+    private final static String COL_TOTAL_FARES = "total_fares";
+    private final static String COL_FAREBOX_RECOVERY = "farebox_recovery";
+    private final static String COL_MILES_PER_TRIP = "miles_per_trip";
+    private final static String COL_OPERATING_EXPENSE_PER_TRIP = "operating_expense_per_trip";
+    private final static String COL_OPERATING_EXPENSE_PER_MILE = "operating_expense_per_mile";
 
     public MetroRankDaoImpl(DataSource dataSource) {
         log.info("Metro Rank Data source: " + dataSource);
@@ -97,6 +102,7 @@ public class MetroRankDaoImpl implements MetroRankDao {
                         statistic.getColumnName(), statistic.getColumnName(), statistic.getColumnName(),
                         metroName
                 );
+        System.out.println(sql);
         MetroRankInfo info = template.queryForObject(sql,
                 new MetroRankInfoRowMapper());
         info.setStatisticName(statistic.getDisplayName());
@@ -291,6 +297,23 @@ public class MetroRankDaoImpl implements MetroRankDao {
         }
     }
 
+    public static class AgencyDataDatumMapper implements RowMapper<AgencyData> {
+
+        @Override
+        public AgencyData mapRow(ResultSet rs, int rowNum) throws SQLException {
+            AgencyData data = new AgencyData();
+            data.setAgencyName(rs.getString(COL_AGENCY_NAME));
+            data.setTotalOperationCost(rs.getInt(COL_OPERATION_EXPENSES));
+            data.setOperationCostPerPerson(rs.getDouble(COL_COST_PER_PERSON));
+            data.setTotalFares(rs.getInt(COL_TOTAL_FARES));
+            data.setFareboxRecovery(rs.getDouble(COL_FAREBOX_RECOVERY));
+            data.setMilesPerTrip(rs.getDouble(COL_MILES_PER_TRIP));
+            data.setOperatingExpensePerTrip(rs.getDouble(COL_OPERATING_EXPENSE_PER_TRIP));
+            data.setOperatingExpensePerMile(rs.getDouble(COL_OPERATING_EXPENSE_PER_MILE));
+            return data;
+        }
+    }
+
     @Override
     public List<AgencyModeDatum> getAgencyModes(String agencyName) {
         String sql = String.format("SELECT agency_name, mode, type_of_service FROM agency " +
@@ -307,6 +330,26 @@ public class MetroRankDaoImpl implements MetroRankDao {
         return template.query(sql, new AgencyModeDatumMapper());
     }
 
+    @Override
+    public List<AgencyData> getAgencyDatums(String metropolitanArea) {
+        String sql = String.format("""
+                        SELECT * FROM (SELECT metro, agency_name, urbanized_population,
+                        SUM(agency_mode.operating_expenses) AS operating_total,
+                        SUM(agency_mode.operating_expenses) / agency.urbanized_population AS cost_per_person,
+                        SUM(agency_mode.fares) AS total_fares,
+                        SUM(agency_mode.fares) / SUM(agency_mode.operating_expenses) AS farebox_recovery,
+                        SUM(agency_mode.passenger_miles) / SUM(agency_mode.upt) AS miles_per_trip,
+                        SUM(agency_mode.operating_expenses) / SUM(agency_mode.UPT) AS operating_expense_per_trip,
+                        SUM(agency_mode.operating_expenses) / (SUM(agency_mode.passenger_miles)) AS operating_expense_per_mile
+                        FROM agency
+                        INNER JOIN agency_mode ON agency_mode.ntd_id = agency.ntd_id
+                        GROUP BY agency.metro, agency.agency_name
+                        ORDER BY agency.urbanized_population DESC)
+                        AS sub2 WHERE metro = '%s' ORDER BY cost_per_person DESC;
+                 """,
+                 metropolitanArea);
+        return template.query(sql, new AgencyDataDatumMapper());
+    }
 
 
 }
