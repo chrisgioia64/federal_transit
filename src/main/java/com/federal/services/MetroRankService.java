@@ -206,4 +206,8 @@ public class MetroRankService {
         return dao.getAgencyDatums(metropolitanArea);
     }
 
+    public String getAgencyDataAsString() {
+        return metroSummaryDao.getAgencyDataAsString();
+    }
+
 }

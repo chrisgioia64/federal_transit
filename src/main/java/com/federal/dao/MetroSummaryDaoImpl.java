@@ -2,6 +2,7 @@ package com.federal.dao;
 
 import com.federal.model.AggregateStatistic;
 import com.federal.model.TransitAggregateType;
+import com.federal.model.web.AgencyData;
 import com.federal.model.web.MetroRankInfo;
 import com.federal.model.web.TravelModeStatisticDatum;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -100,6 +101,39 @@ public class MetroSummaryDaoImpl implements MetroSummaryDao {
             }
             b.append("\n\n");
         }
+        return b.toString();
+    }
+
+    @Override
+    public String getAgencyDataAsString() {
+        List<String> metropolitanAreas = metroRankDao.getMetropolitanAreas();
+        StringBuilder b = new StringBuilder();
+        for (String metropolitanArea : metropolitanAreas) {
+            System.out.println("Metro: " + metropolitanArea);
+            try {
+                List<AgencyData> agencyDatums = metroRankDao.getAgencyDatums(metropolitanArea);
+                String summary = getAgencyDataAsString(agencyDatums, metropolitanArea);
+                b.append(summary);
+            } catch (Exception ex) {
+                // pass
+                System.out.println("  There was an error with " + metropolitanArea);
+            }
+            b.append("\n\n");
+        }
+        return b.toString();
+    }
+
+    private String getAgencyDataAsString(List<AgencyData> datums, String metropolitanArea) {
+        StringBuilder b = new StringBuilder();
+        for (AgencyData datum : datums) {
+            b.append(datum.getAgencyName() + " is an agency for the " + metropolitanArea + " metropolitan area. ");
+            b.append("Its farebox recovery is " + datum.getFareboxRecovery() + ". ");
+            b.append("Its operating expense is " + datum.getOperationCostPerPerson() + " dollars. ");
+            b.append("This agency has " + datum.getMilesPerTrip() + " miles per trip. ");
+            b.append("This agency costs " + datum.getOperatingExpensePerTrip() + " dollars per trip to operate. ");
+            b.append("\n\n");
+        }
+        b.append("\n\n");
         return b.toString();
     }
 }

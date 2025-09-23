@@ -10,4 +10,5 @@ public interface MetroSummaryDao {
 
     String getUptUsageSummary();
 
+    String getAgencyDataAsString();
 }
