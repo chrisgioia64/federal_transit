@@ -3,7 +3,7 @@ runtime: corretto17
 build:
   commands:
     build:
-      - mvn clean package -DskipTests
+      - mvn clean package install -DskipTests
 run:
   command: java -jar target/spring-boot-aws-exe.jar
   network:
