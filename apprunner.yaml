@@ -1,11 +1,5 @@
 version: 1.0
-runtime: corretto11
-build:
-  commands:
-    build:
-      - mvn clean install -DskipTests
 run:
-  command: java -jar target/spring-boot-aws-exe.jar
   network:
     port: 5000
 

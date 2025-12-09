@@ -1,0 +1,35 @@
+{
+    "ServiceName": "federal-transit-api-v2",
+    "SourceConfiguration": {
+      "ImageRepository": {
+        "ImageIdentifier": "339713170431.dkr.ecr.us-east-1.amazonaws.com/federal-transit:latest",
+        "ImageRepositoryType": "ECR",
+        "ImageConfiguration": {
+          "Port": "5000",
+          "RuntimeEnvironmentVariables": {
+            "ENVIRONMENT": "staging",
+            "API_VERSION": "v2"
+          }
+        }
+      },
+      "AuthenticationConfiguration": {
+        "AccessRoleArn": "arn:aws:iam::339713170431:role/service-role/AppRunnerECRAccessRole"
+      }
+    },
+    "InstanceConfiguration": {
+      "Cpu": "2048",
+      "Memory": "4096"
+    },
+    "HealthCheckConfiguration": {
+      "Protocol": "TCP",
+      "Path": "/",
+      "Interval": 5,
+      "Timeout": 2,
+      "HealthyThreshold": 2,
+      "UnhealthyThreshold": 5
+    },
+    "Tags": [
+      {"Key": "Project", "Value": "FederalTransit"},
+      {"Key": "Environment", "Value": "Staging"}
+    ]
+  }
