@@ -210,4 +210,8 @@ public class MetroRankService {
         return metroSummaryDao.getAgencyDataAsString();
     }
 
+    public List<MetroWithCoordinatesDTO> getMetropolitanAreasWithCoordinates() {
+        return dao.getMetropolitanAreasWithCoordinates();
+    }
+
 }

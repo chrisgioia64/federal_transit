@@ -196,4 +196,10 @@ public class QueryController {
         return ResponseEntity.ok(summary);
     }
 
+    @PostMapping("/query/metros_with_coordinates")
+    public ResponseEntity getMetropolitanAreasWithCoordinates() {
+        List<MetroWithCoordinatesDTO> list = metroRankService.getMetropolitanAreasWithCoordinates();
+        return ResponseEntity.ok(list);
+    }
+
 }

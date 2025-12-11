@@ -8,6 +8,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 
 import javax.sql.DataSource;
+import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
@@ -351,7 +352,47 @@ public class MetroRankDaoImpl implements MetroRankDao {
         return template.query(sql, new AgencyDataDatumMapper());
     }
 
+    public class MetroWithCoordinatesMapper implements RowMapper<MetroWithCoordinatesDTO> {
+        @Override
+        public MetroWithCoordinatesDTO mapRow(ResultSet rs, int rowNum) throws SQLException {
+            MetroWithCoordinatesDTO dto = new MetroWithCoordinatesDTO();
+            dto.setName(rs.getString(AgencyDaoImpl.METRO));
+            dto.setState(rs.getString(AgencyDaoImpl.STATE));
+            
+            BigDecimal lat = rs.getBigDecimal("latitude");
+            BigDecimal lon = rs.getBigDecimal("longitude");
+            
+            // Only set if not null
+            if (lat != null) {
+                dto.setLatitude(lat);
+            }
+            if (lon != null) {
+                dto.setLongitude(lon);
+            }
+            
+            // Get population (use MAX since we're grouping by metro)
+            Long population = rs.getLong("population");
+            if (!rs.wasNull()) {
+                dto.setPopulation(population);
+            }
+            
+            return dto;
+        }
+    }
 
-
+    @Override
+    public List<MetroWithCoordinatesDTO> getMetropolitanAreasWithCoordinates() {
+        String sql = "SELECT DISTINCT agency.metro, MAX(agency.state) as state, " +
+                     "MAX(agency.latitude) as latitude, MAX(agency.longitude) as longitude, " +
+                     "MAX(agency.urbanized_population) as population " +
+                     "FROM agency " +
+                     "WHERE agency.urbanized_population >= 500000 " +
+                     "AND agency.latitude IS NOT NULL " +
+                     "AND agency.longitude IS NOT NULL " +
+                     "GROUP BY agency.metro " +
+                     "ORDER BY agency.metro";
+        
+        return template.query(sql, new MetroWithCoordinatesMapper());
+    }
 
 }

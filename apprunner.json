@@ -1,5 +1,5 @@
 {
-    "ServiceName": "federal-transit-api-v2",
+    "ServiceName": "federal-transit-api-v3",
     "SourceConfiguration": {
       "ImageRepository": {
         "ImageIdentifier": "339713170431.dkr.ecr.us-east-1.amazonaws.com/federal-transit:latest",
@@ -8,7 +8,7 @@
           "Port": "5000",
           "RuntimeEnvironmentVariables": {
             "ENVIRONMENT": "staging",
-            "API_VERSION": "v2"
+            "API_VERSION": "v3"
           }
         }
       },

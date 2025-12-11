@@ -4,6 +4,7 @@ import com.federal.model.web.AgencyDatum;
 import com.federal.model.web.AgencyModeDatum;
 import com.federal.model.web.MetroRankInfo;
 import com.federal.model.web.AgencyData;
+import com.federal.model.web.MetroWithCoordinatesDTO;
 import com.federal.model.AggregateStatistic;
 import com.federal.model.TransitAggregateType;
 import com.federal.model.web.TravelModeStatisticDatum;
@@ -58,5 +59,11 @@ public interface MetroRankDao {
     public List<AgencyModeDatum> getAgencyModes(int ntdId);
 
     List<AgencyData> getAgencyDatums(String metropolitanArea);
+
+    /**
+     * Returns all metropolitan areas with their coordinates.
+     * Only returns metros that have coordinates in the database.
+     */
+    List<MetroWithCoordinatesDTO> getMetropolitanAreasWithCoordinates();
 
 }
