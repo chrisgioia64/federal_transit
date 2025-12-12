@@ -1,5 +1,5 @@
 # Build stage
-FROM maven:3.9-eclipse-temurin-17 AS build
+FROM public.ecr.aws/docker/library/maven:3.9-eclipse-temurin-17 AS build
 
 # RUN ping -c 3 google.com
 
@@ -60,7 +60,7 @@ RUN for CERT in xx*; do \
 RUN rm -rf /tmp/rds-ca /tmp/rds-combined-ca-bundle.pem xx*
 
 # Runtime stage
-FROM amazoncorretto:17-alpine-jdk
+FROM public.ecr.aws/amazoncorretto/amazoncorretto:17
 WORKDIR /app
 
 # Copy the built JAR file from build stage
