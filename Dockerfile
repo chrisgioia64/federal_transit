@@ -21,7 +21,7 @@ COPY --from=builder /build/target/spring-boot-aws-exe.jar application.jar
 
 # 2. Copy the resources directory (The SQL files)
 # We copy explicitly from the builder stage so we don't depend on local files
-COPY --from=builder /build/src/main/resources ./resources
+COPY --from=builder /build/src/main/resources ./src/main/resources
 
 EXPOSE 5000
 
