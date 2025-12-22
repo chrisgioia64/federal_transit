@@ -23,6 +23,8 @@ COPY --from=builder /build/target/spring-boot-aws-exe.jar application.jar
 # We copy explicitly from the builder stage so we don't depend on local files
 COPY --from=builder /build/src/main/resources ./src/main/resources
 
+COPY --from=builder /build/docs ./docs
+
 EXPOSE 5000
 
 ENTRYPOINT ["java", "-jar", "application.jar"]
