@@ -6,10 +6,17 @@ import com.federal.model.RidershipData;
 import com.federal.model.web.*;
 import com.federal.model.TransitAggregateType;
 import org.springframework.stereotype.Service;
+import lombok.extern.log4j.Log4j2;
 
+import jakarta.annotation.PreDestroy;
 import javax.sql.DataSource;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
+@Log4j2
 @Service
 public class MetroRankService {
 
@@ -18,6 +25,10 @@ public class MetroRankService {
     private MetroRankDao dao;
     private RidershipDataDao ridershipDataDao;
     private MetroSummaryDao metroSummaryDao;
+    
+    // Thread pool for parallel database queries
+    // Size of 8 allows for concurrent queries without overwhelming the database
+    private final ExecutorService executorService = Executors.newFixedThreadPool(8);
 
     public MetroRankService(DataSource dataSource) {
         this.dataSource = dataSource;
@@ -39,11 +50,30 @@ public class MetroRankService {
     }
 
     public List<MetroRankInfo> getRankInfo(String metroName) {
+        // Execute all 4 queries in parallel using CompletableFuture
+        CompletableFuture<MetroRankInfo> futureUPT = CompletableFuture.supplyAsync(() -> 
+            dao.getRankInfo(metroName, AggregateStatistic.UPT), executorService);
+        CompletableFuture<MetroRankInfo> futurePassengerMiles = CompletableFuture.supplyAsync(() -> 
+            dao.getRankInfo(metroName, AggregateStatistic.PASSENGER_MILES), executorService);
+        CompletableFuture<MetroRankInfo> futureOperatingExpenses = CompletableFuture.supplyAsync(() -> 
+            dao.getRankInfo(metroName, AggregateStatistic.OPERATING_EXPENSES), executorService);
+        CompletableFuture<MetroRankInfo> futureFare = CompletableFuture.supplyAsync(() -> 
+            dao.getRankInfo(metroName, AggregateStatistic.FARE), executorService);
+        
+        // Wait for all queries to complete
+        CompletableFuture.allOf(futureUPT, futurePassengerMiles, futureOperatingExpenses, futureFare).join();
+        
+        // Collect results in the correct order
         List<MetroRankInfo> list = new LinkedList<>();
-        list.add(dao.getRankInfo(metroName, AggregateStatistic.UPT));
-        list.add(dao.getRankInfo(metroName, AggregateStatistic.PASSENGER_MILES));
-        list.add(dao.getRankInfo(metroName, AggregateStatistic.OPERATING_EXPENSES));
-        list.add(dao.getRankInfo(metroName, AggregateStatistic.FARE));
+        try {
+            list.add(futureUPT.join());
+            list.add(futurePassengerMiles.join());
+            list.add(futureOperatingExpenses.join());
+            list.add(futureFare.join());
+        } catch (Exception e) {
+            log.error("Error executing parallel queries for metro: " + metroName, e);
+            throw new RuntimeException("Failed to retrieve metro rank information", e);
+        }
         return list;
     }
 
@@ -60,39 +90,86 @@ public class MetroRankService {
     }
 
     public List<MetroRankInfo> getTransitInfo(String metroName) {
+        // Execute both queries in parallel using CompletableFuture
+        CompletableFuture<MetroRankInfo> futureRail = CompletableFuture.supplyAsync(() -> 
+            dao.getTransitInfo(metroName, AggregateStatistic.UPT, TransitAggregateType.RAIL), executorService);
+        CompletableFuture<MetroRankInfo> futureBus = CompletableFuture.supplyAsync(() -> 
+            dao.getTransitInfo(metroName, AggregateStatistic.UPT, TransitAggregateType.BUS), executorService);
+        
+        // Wait for both queries to complete
+        CompletableFuture.allOf(futureRail, futureBus).join();
+        
+        // Collect results in the correct order
         List<MetroRankInfo> list = new LinkedList<>();
-        list.add(dao.getTransitInfo(metroName, AggregateStatistic.UPT, TransitAggregateType.RAIL));
-        list.add(dao.getTransitInfo(metroName, AggregateStatistic.UPT, TransitAggregateType.BUS));
+        try {
+            list.add(futureRail.join());
+            list.add(futureBus.join());
+        } catch (Exception e) {
+            log.error("Error executing parallel transit queries for metro: " + metroName, e);
+            throw new RuntimeException("Failed to retrieve transit information", e);
+        }
         return list;
     }
 
     public PieChartDatum getAggregateAmount(String metropolitanArea,
                                             AggregateStatistic statistic) {
+        // Execute all 4 queries in parallel using CompletableFuture
+        CompletableFuture<Double> futureBus = CompletableFuture.supplyAsync(() -> 
+            dao.getAggregateAmount(metropolitanArea, statistic, TransitAggregateType.BUS), executorService);
+        CompletableFuture<Double> futureRail = CompletableFuture.supplyAsync(() -> 
+            dao.getAggregateAmount(metropolitanArea, statistic, TransitAggregateType.RAIL), executorService);
+        CompletableFuture<Double> futureDemand = CompletableFuture.supplyAsync(() -> 
+            dao.getAggregateAmount(metropolitanArea, statistic, TransitAggregateType.DEMAND), executorService);
+        CompletableFuture<Double> futureAll = CompletableFuture.supplyAsync(() -> 
+            dao.getAggregateAmount(metropolitanArea, statistic, TransitAggregateType.ALL), executorService);
+        
+        // Wait for all queries to complete
+        CompletableFuture.allOf(futureBus, futureRail, futureDemand, futureAll).join();
+        
+        // Collect results and build response
         List<PieChartDatum.Portion> portions = new LinkedList<>();
         PieChartDatum datum = new PieChartDatum();
-        List<TransitAggregateType> types = List.of(TransitAggregateType.BUS,
-                TransitAggregateType.RAIL,
-                TransitAggregateType.DEMAND);
-        double sum = 0;
-        for (TransitAggregateType type : types) {
-            Double value = dao.getAggregateAmount(metropolitanArea, statistic, type);
-            sum += value;
-            PieChartDatum.Portion portion = new PieChartDatum.Portion();
-            portion.setCategory(type.getTransitTypeName());
-            portion.setData(value);
-            if (value > 0) {
+        
+        try {
+            Double busValue = futureBus.join();
+            Double railValue = futureRail.join();
+            Double demandValue = futureDemand.join();
+            Double total = futureAll.join();
+            
+            double sum = busValue + railValue + demandValue;
+            
+            // Add portions for each transit type
+            if (busValue > 0) {
+                PieChartDatum.Portion portion = new PieChartDatum.Portion();
+                portion.setCategory(TransitAggregateType.BUS.getTransitTypeName());
+                portion.setData(busValue);
                 portions.add(portion);
             }
+            if (railValue > 0) {
+                PieChartDatum.Portion portion = new PieChartDatum.Portion();
+                portion.setCategory(TransitAggregateType.RAIL.getTransitTypeName());
+                portion.setData(railValue);
+                portions.add(portion);
+            }
+            if (demandValue > 0) {
+                PieChartDatum.Portion portion = new PieChartDatum.Portion();
+                portion.setCategory(TransitAggregateType.DEMAND.getTransitTypeName());
+                portion.setData(demandValue);
+                portions.add(portion);
+            }
+            
+            double other = total - sum;
+            if (other > 0) {
+                PieChartDatum.Portion portion = new PieChartDatum.Portion();
+                portion.setCategory("Other");
+                portion.setData(other);
+                portions.add(portion);
+            }
+        } catch (Exception e) {
+            log.error("Error executing parallel aggregate amount queries for metro: " + metropolitanArea, e);
+            throw new RuntimeException("Failed to retrieve aggregate amount information", e);
         }
-        double total = dao.getAggregateAmount(metropolitanArea, statistic, TransitAggregateType.ALL);
-        double other = total - sum;
-
-        PieChartDatum.Portion portion = new PieChartDatum.Portion();
-        portion.setCategory("Other");
-        portion.setData(other);
-        if (other > 0) {
-            portions.add(portion);
-        }
+        
         datum.setEntityName(metropolitanArea);
         datum.setPortions(portions);
         return datum;
@@ -212,6 +289,28 @@ public class MetroRankService {
 
     public List<MetroWithCoordinatesDTO> getMetropolitanAreasWithCoordinates() {
         return dao.getMetropolitanAreasWithCoordinates();
+    }
+    
+    /**
+     * Cleanup method called when the Spring bean is destroyed.
+     * Shuts down the executor service gracefully.
+     */
+    @PreDestroy
+    public void shutdown() {
+        log.info("Shutting down MetroRankService executor service");
+        executorService.shutdown();
+        try {
+            if (!executorService.awaitTermination(60, TimeUnit.SECONDS)) {
+                executorService.shutdownNow();
+                if (!executorService.awaitTermination(60, TimeUnit.SECONDS)) {
+                    log.warn("Executor service did not terminate");
+                }
+            }
+        } catch (InterruptedException e) {
+            executorService.shutdownNow();
+            Thread.currentThread().interrupt();
+            log.error("Error shutting down executor service", e);
+        }
     }
 
 }

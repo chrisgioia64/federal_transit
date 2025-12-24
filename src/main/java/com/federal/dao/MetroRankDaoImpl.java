@@ -87,25 +87,23 @@ public class MetroRankDaoImpl implements MetroRankDao {
 
     @Override
     public MetroRankInfo getRankInfo(String metroName, AggregateStatistic statistic) {
+        String columnName = statistic.getColumnName();
         String sql =
-                String.format("SELECT * FROM (SELECT metro, count, urbanized_population, total, rate, pop_rank, total_rank, " +
+                "SELECT * FROM (SELECT metro, count, urbanized_population, total, rate, pop_rank, total_rank, " +
                 "ROW_NUMBER() OVER (ORDER BY rate DESC) rate_rank " +
-                " FROM (SELECT COUNT(*) AS count, agency.urbanized_population, agency.metro, SUM(agency_mode.%s) AS total, " +
-                "SUM(agency_mode.%s) / agency.urbanized_population AS rate, " +
-                "ROW_NUMBER() OVER (ORDER BY SUM(agency_mode.%s) DESC) total_rank, " +
+                " FROM (SELECT COUNT(*) AS count, agency.urbanized_population, agency.metro, SUM(agency_mode." + columnName + ") AS total, " +
+                "SUM(agency_mode." + columnName + ") / agency.urbanized_population AS rate, " +
+                "ROW_NUMBER() OVER (ORDER BY SUM(agency_mode." + columnName + ") DESC) total_rank, " +
                 "ROW_NUMBER() OVER (ORDER BY agency.urbanized_population DESC) pop_rank " +
                 "FROM agency INNER JOIN agency_mode " +
                 "WHERE agency_mode.ntd_id = agency.ntd_id " +
                 "GROUP BY agency.metro ORDER BY agency.urbanized_population DESC) AS sub " +
                 "WHERE urbanized_population >= 500000) AS sub2 " +
-                "WHERE metro = '%s'" +
-                "ORDER BY rate DESC;",
-                        statistic.getColumnName(), statistic.getColumnName(), statistic.getColumnName(),
-                        metroName
-                );
-        System.out.println(sql);
+                "WHERE metro = ? " +
+                "ORDER BY rate DESC;";
+        log.debug("Executing getRankInfo query for metro: {} with statistic: {}", metroName, statistic.getDisplayName());
         MetroRankInfo info = template.queryForObject(sql,
-                new MetroRankInfoRowMapper());
+                new MetroRankInfoRowMapper(), metroName);
         info.setStatisticName(statistic.getDisplayName());
         return info;
     }
@@ -134,25 +132,24 @@ public class MetroRankDaoImpl implements MetroRankDao {
     public MetroRankInfo getTransitInfo(String metroName,
                                         AggregateStatistic statistic,
                                         TransitAggregateType transitType) {
-        String sql = String.format("SELECT * FROM (SELECT metro, count, urbanized_population, total, rate, total_rank, pop_rank, " +
+        String columnName = statistic.getColumnName();
+        String transitFilter = createOrStatement(transitType);
+        String sql = "SELECT * FROM (SELECT metro, count, urbanized_population, total, rate, total_rank, pop_rank, " +
                 "ROW_NUMBER() OVER (ORDER BY rate DESC) rate_rank " +
-                " FROM (SELECT COUNT(*) AS count, agency.urbanized_population, agency.metro, SUM(agency_mode.%s) AS total, " +
-                "SUM(agency_mode.%s) / agency.urbanized_population AS rate, " +
-                "ROW_NUMBER() OVER (ORDER BY SUM(agency_mode.%s) DESC) total_rank, " +
+                " FROM (SELECT COUNT(*) AS count, agency.urbanized_population, agency.metro, SUM(agency_mode." + columnName + ") AS total, " +
+                "SUM(agency_mode." + columnName + ") / agency.urbanized_population AS rate, " +
+                "ROW_NUMBER() OVER (ORDER BY SUM(agency_mode." + columnName + ") DESC) total_rank, " +
                 "ROW_NUMBER() OVER (ORDER BY agency.urbanized_population DESC) pop_rank " +
                 "FROM agency INNER JOIN agency_mode " +
                 "WHERE agency_mode.ntd_id = agency.ntd_id " +
-                "%s " +
+                transitFilter +
                 "GROUP BY agency.metro ORDER BY agency.urbanized_population DESC) AS sub " +
                 "WHERE urbanized_population >= 500000) AS sub2 " +
-                "WHERE metro = '%s' " +
-                "ORDER BY rate DESC;",
-                statistic.getColumnName(), statistic.getColumnName(), statistic.getColumnName(),
-                createOrStatement(transitType),
-                metroName
-                );
+                "WHERE metro = ? " +
+                "ORDER BY rate DESC;";
+        log.debug("Executing getTransitInfo query for metro: {} with statistic: {} and type: {}", metroName, statistic.getDisplayName(), transitType.getTransitTypeName());
         MetroRankInfo info = template.queryForObject(sql,
-                new MetroRankInfoRowMapper());
+                new MetroRankInfoRowMapper(), metroName);
         info.setStatisticName(statistic.getDisplayName());
         info.setGroupType(transitType.getTransitTypeName());
         return info;
@@ -179,18 +176,17 @@ public class MetroRankDaoImpl implements MetroRankDao {
     @Override
     public double getAggregateAmount(String metropolitanArea,
                                      AggregateStatistic statistic, TransitAggregateType type) {
-        String sql = String.format("SELECT metro, SUM(agency_mode.%s) AS total " +
+        String columnName = statistic.getColumnName();
+        String transitFilter = createOrStatement(type);
+        String sql = "SELECT metro, SUM(agency_mode." + columnName + ") AS total " +
                         "FROM agency LEFT JOIN agency_mode " +
                         "ON agency_mode.ntd_id = agency.ntd_id " +
-                        "%s " +
-                        "WHERE agency.metro = '%s' " +
+                        transitFilter +
+                        "WHERE agency.metro = ? " +
                         "GROUP BY agency.metro " +
-                        "ORDER BY SUM(agency_mode.upt) DESC;",
-                statistic.getColumnName(),
-                MetroRankDaoImpl.createOrStatement(type),
-                metropolitanArea
-        );
-        List<Double> list = template.query(sql, new ScatterplotItemDaoImpl.AggregateStatisticDoubleMapper());
+                        "ORDER BY SUM(agency_mode.upt) DESC;";
+        log.debug("Executing getAggregateAmount query for metro: {} with statistic: {} and type: {}", metropolitanArea, statistic.getDisplayName(), type.getTransitTypeName());
+        List<Double> list = template.query(sql, new ScatterplotItemDaoImpl.AggregateStatisticDoubleMapper(), metropolitanArea);
         if (list.size() == 0) {
             return 0.0;
         } else if (list.size() == 1){
@@ -216,32 +212,33 @@ public class MetroRankDaoImpl implements MetroRankDao {
     @Override
     public List<TravelModeStatisticDatum> getTravelModeStatisticDatums(
             String metropolitanArea, AggregateStatistic statistic) {
-        String sql = String.format("SELECT agency.metro, agency.agency_name, agency_mode.mode, SUM(agency_mode.%s) AS amount " +
+        String columnName = statistic.getColumnName();
+        String sql = "SELECT agency.metro, agency.agency_name, agency_mode.mode, SUM(agency_mode." + columnName + ") AS amount " +
                 "FROM agency INNER JOIN agency_mode " +
                 "ON agency.ntd_id = agency_mode.ntd_id " +
-                "WHERE metro = '%s' " +
+                "WHERE metro = ? " +
                 "GROUP BY agency.agency_name, agency_mode.mode " +
-                "ORDER BY metro;",
-                statistic.getColumnName(), metropolitanArea);
+                "ORDER BY metro;";
+        log.debug("Executing getTravelModeStatisticDatums query for metro: {} with statistic: {}", metropolitanArea, statistic.getDisplayName());
         List<TravelModeStatisticDatum> list
-                = template.query(sql, new TravelModeMapper());
+                = template.query(sql, new TravelModeMapper(), metropolitanArea);
         return list;
     }
 
     @Override
     public List<TravelModeStatisticDatum> getTravelModeStatisticDatumsByYear(String metropolitanArea,
                                                                              int year, String ridershipDataType) {
-        String sql = String.format("Select agency_name, mode, type_of_service, agency_mode_id, year, month, SUM(data) AS amount " +
+        String sql = "Select agency_name, mode, type_of_service, agency_mode_id, year, month, SUM(data) AS amount " +
                 "FROM agency INNER JOIN agency_mode " +
                 "ON agency.ntd_id = agency_mode.ntd_id " +
                 "INNER JOIN ridership_data " +
                 "ON agency_mode.id = ridership_data.agency_mode_id " +
-                "WHERE agency.metro = '%s' AND year = %d " +
-                "AND type = '%s' " +
-                "GROUP BY agency_mode_id, mode, type_of_service, year ",
-                metropolitanArea, year, ridershipDataType);
+                "WHERE agency.metro = ? AND year = ? " +
+                "AND type = ? " +
+                "GROUP BY agency_mode_id, mode, type_of_service, year ";
+        log.debug("Executing getTravelModeStatisticDatumsByYear query for metro: {}, year: {}, type: {}", metropolitanArea, year, ridershipDataType);
         List<TravelModeStatisticDatum> list
-                = template.query(sql, new TravelModeMapper());
+                = template.query(sql, new TravelModeMapper(), metropolitanArea, year, ridershipDataType);
         return list;
     }
 
@@ -254,14 +251,15 @@ public class MetroRankDaoImpl implements MetroRankDao {
 
     @Override
     public List<Integer> getAvailableYears(String metropolitanArea, String ridershipDataType) {
-        String sql = String.format("Select year FROM agency INNER JOIN agency_mode " +
+        String sql = "Select year FROM agency INNER JOIN agency_mode " +
                 "ON agency.ntd_id = agency_mode.ntd_id " +
                 "INNER JOIN ridership_data " +
                 "ON agency_mode.id = ridership_data.agency_mode_id " +
-                "WHERE agency.metro = '%s' AND type = '%s' " +
+                "WHERE agency.metro = ? AND type = ? " +
                 "GROUP BY year " +
-                "ORDER BY year desc;", metropolitanArea, ridershipDataType);
-        return template.query(sql, new YearMapper());
+                "ORDER BY year desc;";
+        log.debug("Executing getAvailableYears query for metro: {} with type: {}", metropolitanArea, ridershipDataType);
+        return template.query(sql, new YearMapper(), metropolitanArea, ridershipDataType);
     }
 
     public static class AgencyDatumMapper implements RowMapper<AgencyDatum> {
@@ -277,13 +275,13 @@ public class MetroRankDaoImpl implements MetroRankDao {
 
     @Override
     public List<AgencyDatum> getAgenciesForMetropolitanArea(String metropolitanArea) {
-        String sql = String.format("SELECT DISTINCT(agency_name), SUM(agency_mode.upt), agency.ntd_id " +
+        String sql = "SELECT DISTINCT(agency_name), SUM(agency_mode.upt), agency.ntd_id " +
                         "FROM agency " +
                 "INNER JOIN agency_mode ON agency.ntd_id = agency_mode.ntd_id " +
-                "WHERE metro = '%s'" +
-                "GROUP BY agency_name ORDER BY SUM(agency_mode.upt) DESC; ",
-                metropolitanArea);
-        return template.query(sql, new AgencyDatumMapper());
+                "WHERE metro = ? " +
+                "GROUP BY agency_name ORDER BY SUM(agency_mode.upt) DESC; ";
+        log.debug("Executing getAgenciesForMetropolitanArea query for metro: {}", metropolitanArea);
+        return template.query(sql, new AgencyDatumMapper(), metropolitanArea);
     }
 
     public static class AgencyModeDatumMapper implements RowMapper<AgencyModeDatum> {
@@ -317,23 +315,25 @@ public class MetroRankDaoImpl implements MetroRankDao {
 
     @Override
     public List<AgencyModeDatum> getAgencyModes(String agencyName) {
-        String sql = String.format("SELECT agency_name, mode, type_of_service FROM agency " +
+        String sql = "SELECT agency_name, mode, type_of_service FROM agency " +
                 "INNER JOIN agency_mode ON agency.ntd_id = agency_mode.ntd_id " +
-                "WHERE agency_name = '%s'", agencyName);
-        return template.query(sql, new AgencyModeDatumMapper());
+                "WHERE agency_name = ?";
+        log.debug("Executing getAgencyModes query for agency: {}", agencyName);
+        return template.query(sql, new AgencyModeDatumMapper(), agencyName);
     }
 
     @Override
     public List<AgencyModeDatum> getAgencyModes(int ntdId) {
-        String sql = String.format("SELECT agency_name, mode, type_of_service FROM agency " +
+        String sql = "SELECT agency_name, mode, type_of_service FROM agency " +
                 "INNER JOIN agency_mode ON agency.ntd_id = agency_mode.ntd_id " +
-                "WHERE agency.ntd_id = %d", ntdId);
-        return template.query(sql, new AgencyModeDatumMapper());
+                "WHERE agency.ntd_id = ?";
+        log.debug("Executing getAgencyModes query for ntdId: {}", ntdId);
+        return template.query(sql, new AgencyModeDatumMapper(), ntdId);
     }
 
     @Override
     public List<AgencyData> getAgencyDatums(String metropolitanArea) {
-        String sql = String.format("""
+        String sql = """
                         SELECT * FROM (SELECT metro, agency_name, urbanized_population,
                         SUM(agency_mode.operating_expenses) AS operating_total,
                         SUM(agency_mode.operating_expenses) / agency.urbanized_population AS cost_per_person,
@@ -346,10 +346,10 @@ public class MetroRankDaoImpl implements MetroRankDao {
                         INNER JOIN agency_mode ON agency_mode.ntd_id = agency.ntd_id
                         GROUP BY agency.metro, agency.agency_name
                         ORDER BY agency.urbanized_population DESC)
-                        AS sub2 WHERE metro = '%s' ORDER BY cost_per_person DESC;
-                 """,
-                 metropolitanArea);
-        return template.query(sql, new AgencyDataDatumMapper());
+                        AS sub2 WHERE metro = ? ORDER BY cost_per_person DESC;
+                 """;
+        log.debug("Executing getAgencyDatums query for metro: {}", metropolitanArea);
+        return template.query(sql, new AgencyDataDatumMapper(), metropolitanArea);
     }
 
     public class MetroWithCoordinatesMapper implements RowMapper<MetroWithCoordinatesDTO> {
