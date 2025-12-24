@@ -69,7 +69,7 @@ UPDATE agency SET latitude = 29.4251905, longitude = -98.4945922 WHERE metro = '
 UPDATE agency SET latitude = 32.715738, longitude = -117.1610838 WHERE metro = 'San Diego, CA';
 UPDATE agency SET latitude = 37.8043514, longitude = -122.2711639 WHERE metro = 'San Francisco-Oakland, CA';
 UPDATE agency SET latitude = 37.33874, longitude = -121.8852525 WHERE metro = 'San Jose, CA';
-UPDATE agency SET latitude = 38.7945952, longitude = -106.5348379 WHERE metro = 'San Juan, PR';
+UPDATE agency SET latitude = 18.4135598, longitude =-66.06043384 WHERE metro = 'San Juan, PR';
 UPDATE agency SET latitude = 27.336465, longitude = -82.5310117 WHERE metro = 'Sarasota-Bradenton, FL';
 UPDATE agency SET latitude = 47.6061389, longitude = -122.3328481 WHERE metro = 'Seattle, WA';
 UPDATE agency SET latitude = 42.1013104, longitude = -72.58927419999999 WHERE metro = 'Springfield, MA-CT';
