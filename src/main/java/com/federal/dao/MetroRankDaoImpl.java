@@ -102,8 +102,13 @@ public class MetroRankDaoImpl implements MetroRankDao {
                 "WHERE metro = ? " +
                 "ORDER BY rate DESC;";
         log.debug("Executing getRankInfo query for metro: {} with statistic: {}", metroName, statistic.getDisplayName());
-        MetroRankInfo info = template.queryForObject(sql,
+        List<MetroRankInfo> results = template.query(sql,
                 new MetroRankInfoRowMapper(), metroName);
+        if (results.isEmpty()) {
+            log.warn("No rank info found for metro: {} with statistic: {}", metroName, statistic.getDisplayName());
+            return null;
+        }
+        MetroRankInfo info = results.get(0);
         info.setStatisticName(statistic.getDisplayName());
         return info;
     }
@@ -148,8 +153,13 @@ public class MetroRankDaoImpl implements MetroRankDao {
                 "WHERE metro = ? " +
                 "ORDER BY rate DESC;";
         log.debug("Executing getTransitInfo query for metro: {} with statistic: {} and type: {}", metroName, statistic.getDisplayName(), transitType.getTransitTypeName());
-        MetroRankInfo info = template.queryForObject(sql,
+        List<MetroRankInfo> results = template.query(sql,
                 new MetroRankInfoRowMapper(), metroName);
+        if (results.isEmpty()) {
+            log.warn("No transit info found for metro: {} with statistic: {} and type: {}", metroName, statistic.getDisplayName(), transitType.getTransitTypeName());
+            return null;
+        }
+        MetroRankInfo info = results.get(0);
         info.setStatisticName(statistic.getDisplayName());
         info.setGroupType(transitType.getTransitTypeName());
         return info;
@@ -275,13 +285,21 @@ public class MetroRankDaoImpl implements MetroRankDao {
 
     @Override
     public List<AgencyDatum> getAgenciesForMetropolitanArea(String metropolitanArea) {
-        String sql = "SELECT DISTINCT(agency_name), SUM(agency_mode.upt), agency.ntd_id " +
+        // Fixed: Added agency.ntd_id to GROUP BY to avoid SQL ambiguity
+        // Also removed DISTINCT since GROUP BY already ensures uniqueness
+        String sql = "SELECT agency_name, SUM(agency_mode.upt) AS total_upt, agency.ntd_id " +
                         "FROM agency " +
                 "INNER JOIN agency_mode ON agency.ntd_id = agency_mode.ntd_id " +
-                "WHERE metro = ? " +
-                "GROUP BY agency_name ORDER BY SUM(agency_mode.upt) DESC; ";
+                "WHERE agency.metro = ? " +
+                "GROUP BY agency_name, agency.ntd_id " +
+                "ORDER BY SUM(agency_mode.upt) DESC; ";
         log.debug("Executing getAgenciesForMetropolitanArea query for metro: {}", metropolitanArea);
-        return template.query(sql, new AgencyDatumMapper(), metropolitanArea);
+        List<AgencyDatum> results = template.query(sql, new AgencyDatumMapper(), metropolitanArea);
+        log.debug("Found {} agencies for metro: {}", results.size(), metropolitanArea);
+        if (results.isEmpty()) {
+            log.warn("No agencies found for metro: {}", metropolitanArea);
+        }
+        return results;
     }
 
     public static class AgencyModeDatumMapper implements RowMapper<AgencyModeDatum> {

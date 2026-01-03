@@ -63,13 +63,32 @@ public class MetroRankService {
         // Wait for all queries to complete
         CompletableFuture.allOf(futureUPT, futurePassengerMiles, futureOperatingExpenses, futureFare).join();
         
-        // Collect results in the correct order
+        // Collect results in the correct order, handling null results gracefully
         List<MetroRankInfo> list = new LinkedList<>();
         try {
-            list.add(futureUPT.join());
-            list.add(futurePassengerMiles.join());
-            list.add(futureOperatingExpenses.join());
-            list.add(futureFare.join());
+            MetroRankInfo uptInfo = futureUPT.join();
+            MetroRankInfo passengerMilesInfo = futurePassengerMiles.join();
+            MetroRankInfo operatingExpensesInfo = futureOperatingExpenses.join();
+            MetroRankInfo fareInfo = futureFare.join();
+            
+            // Only add non-null results (some metros may not have data for certain statistics)
+            if (uptInfo != null) {
+                list.add(uptInfo);
+            }
+            if (passengerMilesInfo != null) {
+                list.add(passengerMilesInfo);
+            }
+            if (operatingExpensesInfo != null) {
+                list.add(operatingExpensesInfo);
+            }
+            if (fareInfo != null) {
+                list.add(fareInfo);
+            }
+            
+            // Log warning if no data found
+            if (list.isEmpty()) {
+                log.warn("No rank info found for metro: {}", metroName);
+            }
         } catch (Exception e) {
             log.error("Error executing parallel queries for metro: " + metroName, e);
             throw new RuntimeException("Failed to retrieve metro rank information", e);
@@ -99,11 +118,24 @@ public class MetroRankService {
         // Wait for both queries to complete
         CompletableFuture.allOf(futureRail, futureBus).join();
         
-        // Collect results in the correct order
+        // Collect results in the correct order, handling null results gracefully
         List<MetroRankInfo> list = new LinkedList<>();
         try {
-            list.add(futureRail.join());
-            list.add(futureBus.join());
+            MetroRankInfo railInfo = futureRail.join();
+            MetroRankInfo busInfo = futureBus.join();
+            
+            // Only add non-null results (some metros may not have Rail or Bus data)
+            if (railInfo != null) {
+                list.add(railInfo);
+            }
+            if (busInfo != null) {
+                list.add(busInfo);
+            }
+            
+            // Log warning if no data found
+            if (list.isEmpty()) {
+                log.warn("No transit info found for metro: {}", metroName);
+            }
         } catch (Exception e) {
             log.error("Error executing parallel transit queries for metro: " + metroName, e);
             throw new RuntimeException("Failed to retrieve transit information", e);
